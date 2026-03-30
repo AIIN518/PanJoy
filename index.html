@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>动达｜体育外卖小程序 - 融合版</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#10213a;
+      --muted:#667085;
+      --line:rgba(16,33,58,.08);
+      --brand:#2563eb;
+      --brand2:#22c7ff;
+      --brand3:#6d5efc;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 16px 40px rgba(15,23,42,.08);
+      --radius:18px;
+      --radius-sm:12px;
+      --tab-h:78px;
+      --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1100px 520px at 10% -10%, rgba(37,99,235,.18), transparent 55%),
+        radial-gradient(900px 480px at 100% 0%, rgba(34,199,255,.16), transparent 52%),
+        var(--bg);
+    }
+
+    .app{
+      max-width:540px;
+      margin:0 auto;
+      min-height:100vh;
+      position:relative;
+      padding-bottom:calc(var(--tab-h) + 18px);
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:30;
+      padding:16px 14px 10px;
+      backdrop-filter:blur(14px);
+      background:linear-gradient(180deg, rgba(244,247,251,.95), rgba(244,247,251,.82));
+      border-bottom:1px solid rgba(16,33,58,.04);
+    }
+
+    .topbar.hide-search .search-wrap {
+      display: none;
+    }
+
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:linear-gradient(135deg,var(--brand),var(--brand2));
+      box-shadow:0 14px 28px rgba(37,99,235,.25);
+      color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;
+      flex:0 0 auto;
+    }
+    .brand h1{margin:0;font-size:17px;line-height:1.1}
+    .brand p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .header-tools{display:flex;gap:8px}
+    .chip-btn,.pill,.tab,.mini-btn,.icon-btn,.cta-btn,.ghost-btn,.action-btn{border:none;cursor:pointer;font-family:inherit}
+    .chip-btn,.pill{
+      padding:10px 12px;border-radius:999px;font-size:12px;font-weight:800;
+      background:rgba(37,99,235,.10);color:var(--brand);border:1px solid rgba(37,99,235,.16);
+    }
+
+    .search-wrap{display:flex;gap:8px;margin-top:12px}
+    .searchbox{
+      flex:1;display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:11px 13px;
+      border:1px solid rgba(16,33,58,.06);box-shadow:0 8px 22px rgba(15,23,42,.05);
+    }
+    .searchbox input{border:none;outline:none;background:transparent;width:100%;font-size:13px;color:var(--text)}
+    .search-icon{
+      width:24px;height:24px;border-radius:9px;background:rgba(37,99,235,.1);display:flex;align-items:center;justify-content:center;
+      color:var(--brand);font-size:12px;font-weight:900;flex:0 0 auto;
+    }
+
+    .content{padding:14px}
+    .page{display:none}
+    .page.active{display:block}
+    .section{margin-bottom:16px}
+
+    .hero{
+      position:relative;overflow:hidden;border-radius:22px;padding:16px;
+      background:linear-gradient(135deg, rgba(37,99,235,.14), rgba(34,199,255,.14), rgba(109,94,252,.13));
+      border:1px solid rgba(37,99,235,.14);box-shadow:0 18px 40px rgba(37,99,235,.11);
+    }
+    .hero h2{margin:0 0 8px;font-size:19px;line-height:1.25}
+    .hero p{margin:0;color:#445268;font-size:13px;line-height:1.55}
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;margin-bottom:10px;
+      font-size:11px;font-weight:900;color:var(--brand);
+      background:rgba(255,255,255,.72);border:1px solid rgba(37,99,235,.12)
+    }
+    .hero-actions{display:flex;gap:10px;margin-top:14px}
+    .cta-btn{
+      flex:1;padding:12px 14px;border-radius:14px;font-weight:900;font-size:13px;color:#fff;
+      background:linear-gradient(90deg,var(--brand),var(--brand2));box-shadow:0 16px 26px rgba(37,99,235,.22)
+    }
+    .ghost-btn{
+      width:48px;border-radius:14px;background:#fff;color:var(--text);border:1px solid rgba(16,33,58,.08)
+    }
+    .float-glow{position:absolute;right:-35px;top:-35px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle, rgba(34,199,255,.35), transparent 68%)}
+
+    .ad-strip{overflow:hidden;padding:2px 0;position:relative}
+    .ad-track{display:flex;gap:12px;width:max-content;animation:marquee 18s linear infinite;will-change:transform}
+    .ad-strip:hover .ad-track{animation-play-state:paused}
+    .ad-card{
+      width:240px;flex:0 0 auto;padding:14px;border-radius:18px;color:#fff;position:relative;overflow:hidden;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      transition: transform 0.2s;
+    }
+    .ad-card:hover{transform:scale(1.02);}
+    .ad-card:nth-child(5n+1){background:linear-gradient(135deg,#2563eb,#22c7ff)}
+    .ad-card:nth-child(5n+2){background:linear-gradient(135deg,#6d5efc,#2563eb)}
+    .ad-card:nth-child(5n+3){background:linear-gradient(135deg,#0f766e,#22c55e)}
+    .ad-card:nth-child(5n+4){background:linear-gradient(135deg,#f97316,#ef4444)}
+    .ad-card:nth-child(5n+5){background:linear-gradient(135deg,#7c3aed,#ec4899)}
+    .ad-card h3{margin:0 0 6px;font-size:15px}
+    .ad-card p{margin:0;font-size:12px;line-height:1.5;opacity:.94}
+    .ad-card .mark{margin-top:10px;display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.16);font-size:11px;font-weight:900}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{
+      background:var(--card);border-radius:18px;border:1px solid rgba(16,33,58,.06);box-shadow:0 10px 24px rgba(15,23,42,.05);padding:13px;
+    }
+    .card-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:13px;font-weight:900}
+    .tag{
+      flex:0 0 auto;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;
+      background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.18);color:var(--brand)
+    }
+    .tag.good{background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.2);color:#166534}
+    .tag.warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.22);color:#92400e}
+
+    .mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .option-box{
+      padding:12px;border-radius:14px;border:1px solid rgba(16,33,58,.06);background:linear-gradient(180deg, #fff, #fbfcff);
+    }
+    .option-box b{display:block;font-size:13px;margin-bottom:4px}
+    .option-box span{font-size:12px;color:var(--muted);line-height:1.45}
+
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      padding:11px;border-radius:15px;border:1px solid rgba(16,33,58,.06);background:#fff;
+    }
+    .left{min-width:0;flex:1}
+    .name{margin:0 0 5px;font-size:13px;font-weight:900;line-height:1.35}
+    .meta{margin:0;font-size:12px;color:var(--muted);line-height:1.5}
+    .badge{
+      flex:0 0 auto;padding:7px 9px;border-radius:12px;font-size:11px;font-weight:900;text-align:center;
+      background:rgba(34,199,255,.11);border:1px solid rgba(34,199,255,.24);color:#0b4a5a;white-space:nowrap
+    }
+
+    .filters{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding-bottom:6px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+    }
+    .filters::-webkit-scrollbar{display:none}
+    .tab{
+      padding:9px 12px;
+      border-radius:999px;
+      white-space:nowrap;
+      background:#fff;
+      color:var(--muted);
+      border:1px solid rgba(16,33,58,.08);
+      font-size:12px;
+      font-weight:800;
+      flex-shrink:0;
+      scroll-snap-align: start;
+      transition: all 0.2s ease;
+    }
+    .tab.active{background:linear-gradient(90deg, rgba(37,99,235,.12), rgba(34,199,255,.12));color:var(--brand);border-color:rgba(37,99,235,.18);}
+
+    /* 日期双行专用样式 */
+    .date-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .date-row:last-of-type {
+      margin-bottom: 0;
+    }
+    .day-tab {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      border: 1px solid rgba(16,33,58,.08);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 0 0 auto;
+    }
+    .day-tab.active {
+      background: linear-gradient(90deg, rgba(37,99,235,.12), rgba(34,199,255,.12));
+      color: var(--brand);
+      border-color: rgba(37,99,235,.18);
+    }
+
+    .schedule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .slot{
+      padding:10px 8px;border-radius:12px;border:1px solid rgba(16,33,58,.08);background:#fff;font-size:12px;font-weight:800;text-align:center;cursor:pointer
+    }
+    .slot.active{background:linear-gradient(180deg, rgba(37,99,235,.12), rgba(34,199,255,.1));border-color:rgba(37,99,235,.22);color:var(--brand)}
+    .slot.off{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{
+      padding:12px 10px;border-radius:16px;background:linear-gradient(180deg,#fff,#fafcff);border:1px solid rgba(16,33,58,.06);text-align:center
+    }
+    .stat b{display:block;font-size:16px;margin-bottom:4px}
+    .stat span{font-size:11px;color:var(--muted);line-height:1.35}
+
+    .timeline{display:flex;flex-direction:column;gap:10px}
+    .step{
+      display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:14px;background:#fff;border:1px solid rgba(16,33,58,.06)
+    }
+    .step-dot{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex:0 0 auto}
+    .step b{display:block;font-size:13px;margin-bottom:4px}
+    .step span{font-size:12px;color:var(--muted);line-height:1.5}
+
+    .toolbar{display:flex;gap:8px;margin-top:10px}
+    .mini-btn,.action-btn{
+      padding:10px 12px;border-radius:13px;font-size:12px;font-weight:900;background:rgba(37,99,235,.1);color:var(--brand);border:1px solid rgba(37,99,235,.16)
+    }
+    .action-btn{width:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border:none}
+
+    .highlight-box{
+      border-radius:16px;padding:13px;background:linear-gradient(135deg, rgba(22,163,74,.08), rgba(34,197,94,.06));border:1px solid rgba(22,163,74,.12)
+    }
+    .highlight-box b{display:block;font-size:13px;margin-bottom:6px}
+    .highlight-box p{margin:0;font-size:12px;color:#456150;line-height:1.55}
+
+    .bottom-tabs{
+      position:fixed;left:0;right:0;bottom:0;height:var(--tab-h);z-index:40;
+      backdrop-filter:blur(12px);background:rgba(255,255,255,.78);border-top:1px solid rgba(16,33,58,.08);
+      overflow-x:auto;
+      white-space:nowrap;
+      scrollbar-width:none;
+    }
+    .bottom-tabs::-webkit-scrollbar{display:none}
+    .bottom-inner{
+      display:inline-flex;
+      gap:6px;
+      padding:10px 14px 12px;
+      min-width:100%;
+      justify-content:space-evenly;
+    }
+    .nav-btn{
+      border:none;background:transparent;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+      color:rgba(16,33,58,.56);font-size:11px;font-weight:900;cursor:pointer;
+      padding:0 6px;
+    }
+    .nav-btn .ico{
+      width:30px;height:30px;border-radius:12px;border:1px solid rgba(16,33,58,.1);background:#fff;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 16px rgba(15,23,42,.05)
+    }
+    .nav-btn.active{color:var(--brand)}
+    .nav-btn.active .ico{background:linear-gradient(180deg, rgba(37,99,235,.12), rgba(34,199,255,.1));border-color:rgba(37,99,235,.18)}
+
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.5);display:none;z-index:60}
+    .overlay.show{display:block}
+    .modal{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(470px,92vw);max-height:86vh;overflow:auto;
+      background:#fff;border-radius:20px;box-shadow:0 26px 80px rgba(2,6,23,.28)
+    }
+    .mhead{padding:14px;border-bottom:1px solid rgba(16,33,58,.08);background:linear-gradient(135deg, rgba(37,99,235,.1), rgba(34,199,255,.08))}
+    .mhead h3{margin:0;font-size:15px}
+    .mhead p{margin:6px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+    .mbody{padding:14px}
+    .mfoot{padding:14px;border-top:1px solid rgba(16,33,58,.08);display:flex;gap:10px}
+    .secondary{
+      width:110px;border-radius:14px;border:1px solid rgba(16,33,58,.12);background:#fff;color:var(--text);font-weight:900;cursor:pointer
+    }
+    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field label{display:block;margin-bottom:6px;font-size:12px;font-weight:900;color:var(--muted)}
+    .field input,.field select,.field textarea{
+      width:100%;padding:11px 12px;border-radius:13px;border:1px solid rgba(16,33,58,.12);outline:none;font-family:inherit;font-size:13px;background:#fff;color:var(--text)
+    }
+    .field textarea{min-height:90px;resize:vertical}
+    .result-box{margin-top:12px;padding:12px;border-radius:14px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.14);font-size:13px;line-height:1.6}
+    .muted{color:var(--muted)}
+    .full{grid-column:1 / -1}
+
+    .footer-note{padding:4px 2px 10px;font-size:12px;color:var(--muted);line-height:1.55}
+
+    .search-panel{margin-top:12px}
+    .search-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .search-count{font-size:12px;color:var(--muted);font-weight:800}
+    .search-suggest{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;margin-bottom:10px}
+    .search-suggest::-webkit-scrollbar{display:none}
+    .search-chip{border:none;cursor:pointer;padding:8px 10px;border-radius:999px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.14);color:var(--brand);font-size:12px;font-weight:800;white-space:nowrap}
+    .search-item{cursor:pointer}
+    .search-item .meta-line{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .search-pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;background:#f3f6fb;color:#415067;border:1px solid rgba(16,33,58,.08)}
+    .search-empty{padding:14px;border-radius:14px;background:#fff;border:1px dashed rgba(16,33,58,.12);font-size:12px;color:var(--muted);line-height:1.6}
+    @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 6px))}}
+
+    /* 我的页面样式 */
+    .profile-header {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      border-radius: 24px;
+      padding: 20px;
+      color: white;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--brand);
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .profile-name {
+      font-size: 20px;
+      font-weight: 900;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .profile-name button {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: white;
+      cursor: pointer;
+    }
+    .profile-phone {
+      font-size: 13px;
+      opacity: 0.9;
+      margin: 0;
+    }
+    .address-card {
+      margin-top: 12px;
+    }
+    .address-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .address-item:last-child {
+      border-bottom: none;
+    }
+    .address-info {
+      flex: 1;
+    }
+    .address-name {
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .address-detail {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .address-actions button {
+      background: none;
+      border: none;
+      color: var(--brand);
+      font-size: 12px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .add-address-btn {
+      margin-top: 12px;
+      width: 100%;
+      background: rgba(37,99,235,.08);
+      border: 1px dashed var(--brand);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      color: var(--brand);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* 订单列表样式 */
+    .order-item{
+      border-bottom:1px solid var(--line);
+      padding:12px 0;
+    }
+    .order-item:last-child{
+      border-bottom:none;
+    }
+
+    /* 融合搜索页专属头部 */
+    .search-page-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      background: #fff;
+      border-radius: 28px;
+      padding: 8px 12px;
+      border: 1px solid rgba(16,33,58,.06);
+      box-shadow: 0 6px 12px rgba(0,0,0,.02);
+    }
+    .search-page-header .back-btn {
+      background: rgba(37,99,235,.08);
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 30px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--brand);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-page-header .search-input-area {
+      flex: 1;
+      background: #f4f7fc;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      gap: 8px;
+    }
+    .search-page-header .search-input-area input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      outline: none;
+    }
+    .search-page-header .search-input-area span {
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    /* 统一支付相关按钮样式 */
+    .price-pay-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+    .price-pay-btn:hover {
+      opacity: 0.9;
+    }
+    .inline-btn {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .action-btn, .cta-btn {
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      color: #fff;
+      border: none;
+    }
+    .modal .action-btn {
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      color: #fff;
+    }
+
+    .admin-menu-entry {
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .admin-menu-entry:hover {
+      background: rgba(37, 99, 235, 0.04);
+      border-color: rgba(37, 99, 235, 0.12);
+    }
+    .admin-menu-entry .badge {
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--brand);
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+
+    @media (max-width:460px){
+      .grid-2,.formgrid,.stats{grid-template-columns:1fr}
+      .schedule-grid{grid-template-columns:repeat(2,1fr)}
+      .nav-btn{font-size:10px;padding:0 4px}
+      .nav-btn .ico{width:26px;height:26px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar" id="appTopbar">
+    <div class="row">
+      <div class="brand">
+        <div class="logo">动</div>
+        <div style="min-width:0">
+          <h1>动达｜运动到家</h1>
+          <p>1公里内，1小时到，家门口的专业体育服务</p>
+        </div>
+      </div>
+      <div class="header-tools">
+        <button class="chip-btn" id="openDiscount">拼团方案</button>
+        <button class="chip-btn" id="openOrderModal">立即约</button>
+      </div>
+    </div>
+    <div class="search-wrap" id="globalSearchWrap">
+      <div class="searchbox">
+        <div class="search-icon">搜</div>
+        <input id="globalSearch" type="text" placeholder="搜索教练 / 项目 / 线上课程 / 拼团活动" readonly />
+      </div>
+      <button class="pill" id="searchBtn">搜索</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- 首页 -->
+    <section class="page active" id="page-home">
+      <div class="section hero">
+        <div class="float-glow"></div>
+        <div class="hero-badge">轻量入口 · 即时预约 · 安全履约</div>
+        <h2>体育外卖 × 小程序 / APP</h2>
+        <p>教练上门 + 场地灵活 + 即时预约 </p>
+        <div class="hero-actions">
+          <button class="cta-btn" data-switch="booking">开始预约下单 →</button>
+          <button class="ghost-btn" data-switch="groups" title="拼团专区">团</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="card-title" style="margin-bottom:8px"><span>活动信息</span><span class="tag">点击跳转</span></div>
+        <div class="ad-strip" id="adStrip">
+          <div class="ad-track">
+            <div class="ad-card"><h3>新人首单立减 30 元</h3><p>首单预约私教、拼团课、线上直播课均可使用。</p><div class="mark">新客拉新</div></div>
+            <div class="ad-card"><h3>体考冲刺周｜满 5 人 9 折</h3><p>面向校园体测、体考训练、社团集训场景，支持一键邀请同学参团。</p><div class="mark">拼团</div></div>
+            <div class="ad-card"><h3>线上直播课上线</h3><p>瑜伽、燃脂、康复拉伸、体考理论指导均可线上预约。</p><div class="mark">线上</div></div>
+            <div class="ad-card"><h3>社区亲子运动周末团</h3><p>周末社区开团，支持场地预约 + 教练上门 + 拼团优惠联动。</p><div class="mark">社区场景</div></div>
+            <div class="ad-card"><h3>企业工间操月卡上线</h3><p>企业员工可按月采购团课，支持企业统一结算。</p><div class="mark">企业</div></div>
+            <div class="ad-card"><h3>新人首单立减 30 元</h3><p>首单预约私教、拼团课、线上直播课均可使用。</p><div class="mark">新客拉新</div></div>
+            <div class="ad-card"><h3>体考冲刺周｜满 5 人 9 折</h3><p>面向校园体测、体考训练、社团集训场景。</p><div class="mark">拼团</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="section grid-2">
+        <div class="card"><div class="card-title"><span>核心服务</span><span class="tag good">多场景</span></div><div class="mini-grid">
+          <div class="option-box" style="cursor:pointer" onclick="goToSearchCoaches()"><b>上门私教</b><span>篮球 / 体能 / 瑜伽 / 体考 / 游泳 / 羽毛球 / 网球</span></div>
+          <div class="option-box" style="cursor:pointer" onclick="openVenueBookingModal()"><b>场地预约</b><span>公园 / 操场 / 小区空地</span></div>
+          <div class="option-box" style="cursor:pointer" onclick="openEquipmentRentalModal()"><b>器材租赁</b><span>护具 / 球类 / 训练器材</span></div>
+          <div class="option-box" style="cursor:pointer" onclick="openSupplementCartModal()"><b>运动补给</b><span>水 / 毛巾 / 护腕</span></div>
+        </div></div>
+        <div class="card"><div class="card-title"><span>服务人群</span><span class="tag">精准定位</span></div><div class="mini-grid"><div class="option-box"><b>校园</b><span>中、高考 / 体育生 / 社团</span></div><div class="option-box"><b>社区</b><span>亲子运动 / 体考 / 康养</span></div><div class="option-box"><b>企业</b><span>团建活动 / 工间操</span></div><div class="option-box"><b>线上用户</b><span>直播课 / 训练打卡</span></div></div></div>
+      </div>
+    </section>
+
+    <!-- 预约页面 -->
+    <section class="page" id="page-booking">
+      <div class="section hero">
+        <div class="hero-badge">选项目 → 选教练 → 选时间地点 → 支付 → 跟踪</div>
+        <h2>预约下单详细流程</h2>
+        <p>支持选择线下上门、固定场地、线上直播课三种履约方式，并可叠加拼团优惠、会员价、优惠券。</p>
+        <div class="hero-actions"><button class="cta-btn" id="openBookingWizard">填写预约信息 →</button><button class="ghost-btn" id="showTrackBtn">订单</button></div>
+      </div>
+      <div class="section grid-2">
+        <div class="card">
+          <div class="card-title"><span>课程时段管理</span><span class="tag good">日期双行 | 时段可选</span></div>
+          <div class="date-row"><button class="day-tab active" data-day="周一">周一</button><button class="day-tab" data-day="周二">周二</button><button class="day-tab" data-day="周三">周三</button><button class="day-tab" data-day="周四">周四</button></div>
+          <div class="date-row"><button class="day-tab" data-day="周五">周五</button><button class="day-tab" data-day="周六">周六</button><button class="day-tab" data-day="周日">周日</button></div>
+          <div class="schedule-grid" id="timeSlots"><div class="slot">08:00</div><div class="slot active">10:00</div><div class="slot">14:00</div><div class="slot">16:00</div><div class="slot off">18:00</div><div class="slot">20:00</div></div>
+          <div class="footer-note">点击日期切换，时段支持动态配置；周末高峰期建议提前预约。</div>
+        </div>
+        <div class="card"><div class="card-title"><span>预约方式</span><span class="tag">三种上课方式</span></div><div class="list"><div class="item"><div class="left"><p class="name">上门私教</p><p class="meta">教练到宿舍楼下 / 小区空地 / 社区场地</p></div><div class="badge">线下</div></div><div class="item"><div class="left"><p class="name">场地约课</p><p class="meta">学校操场 / 球馆 / 公园球场定点训练</p></div><div class="badge">到场</div></div><div class="item"><div class="left"><p class="name">线上课程</p><p class="meta">直播课 / 录播包 / 打卡训练营</p></div><div class="badge">线上</div></div></div></div>
+      </div>
+      <div class="section card"><div class="card-title"><span>订单跟踪流程</span><span class="tag warn">履约闭环</span></div><div class="timeline"><div class="step"><div class="step-dot">1</div><div><b>订单已创建</b><span>系统锁定教练档期、场地资源、器材库存，进入待支付状态。</span></div></div><div class="step"><div class="step-dot">2</div><div><b>教练已接单</b><span>显示教练实时位置、预计到达时间、联系电话与紧急联系人。</span></div></div><div class="step"><div class="step-dot">3</div><div><b>到场核销</b><span>支持动态验证码、扫码核销、上课拍照留痕，减少纠纷。</span></div></div><div class="step"><div class="step-dot">4</div><div><b>课程完成</b><span>自动结算、评价、积分到账，可继续复购或转拼团。</span></div></div></div></div>
+    </section>
+
+    <!-- 拼团页面 -->
+    <section class="page" id="page-groups"><div class="section hero"><div class="hero-badge">拼团/团购 </div><h2>拼团专区 + 折扣结构方案</h2><p>支持“满 5 人 9 折，满 10 人 8 折，满 20 人 7 折”阶梯式优惠；适合社团、班级、社区和企业团建。</p><div class="hero-actions"><button class="cta-btn" id="openGroupCalc">打开拼团测算 →</button><button class="ghost-btn" id="joinGroupBtn">开团</button></div></div><div class="section grid-2"><div class="card"><div class="card-title"><span>拼团折扣结构</span><span class="tag">核心规则</span></div><div class="list"><div class="item"><div class="left"><p class="name">0 - 4 人</p><p class="meta">未成团，保持原价，无折扣</p></div><div class="badge">原价</div></div><div class="item"><div class="left"><p class="name">满 5 人</p><p class="meta">自动触发 9 折，适合宿舍 / 同学小团</p></div><div class="badge">9 折</div></div><div class="item"><div class="left"><p class="name">满 10 人</p><p class="meta">自动触发 8 折，适合班级 / 社团</p></div><div class="badge">8 折</div></div><div class="item"><div class="left"><p class="name">满 20 人</p><p class="meta">自动触发 7 折，适合企业团建 / 社区活动</p></div><div class="badge">7 折</div></div></div></div><div class="card"><div class="card-title"><span>拼团场景</span><span class="tag good">全年龄段友好</span></div><div class="list"><div class="item"><div class="left"><p class="name">校园操场体能课</p><p class="meta">限时开团，支持分享到宿舍群 / 班群</p></div><div class="badge">校园</div></div><div class="item"><div class="left"><p class="name">减脂训练营</p><p class="meta">线上打卡 + 线下周末集训组合</p></div><div class="badge">混合</div></div><div class="item"><div class="left"><p class="name">社区亲子运动</p><p class="meta">按小区 / 社区邻里组队开团</p></div><div class="badge">社区</div></div><div class="item"><div class="left"><p class="name">企业午间工间操</p><p class="meta">固定周期团购</p></div><div class="badge">企业</div></div></div></div></div><div class="section card"><div class="card-title"><span>附近拼团活动</span><span class="tag">类似团购</span></div><div class="list" id="groupActivityList"></div></div></section>
+
+    <!-- 线上课页面 -->
+    <section class="page" id="page-online">
+      <div class="section hero">
+        <div class="float-glow"></div>
+        <div class="hero-badge">随时随地 · 云端开练</div>
+        <h2>线上课程 · 直播/录播/训练营</h2>
+        <p>宿舍、居家、办公室，专业教练在线指导，回放不限次</p>
+        <div class="hero-actions">
+          <button class="cta-btn" id="onlineHeroBtn">浏览全部课程 →</button>
+          <button class="ghost-btn" id="onlineHotBtn">🔥 热门推荐</button>
+        </div>
+      </div>
+      <div class="section card" id="myOnlineClassSection">
+        <div class="card-title"><span>我要上课</span><span class="tag good">已购课程</span></div>
+        <p class="meta" style="margin:0 0 10px;font-size:12px;color:var(--muted);">订单中存在「线上课程」时，可在此选择进入上课（观看课程内容）。</p>
+        <div class="list" id="myOnlineClassList"></div>
+      </div>
+      <div class="section card">
+        <div class="card-title"><span>🔥 精选线上课</span><span class="tag good">热卖中</span></div>
+        <div class="list" id="onlineCourseList"></div>
+      </div>
+      <div class="section card">
+        <div class="card-title"><span>📌 课程类型</span><span class="tag">灵活选择</span></div>
+        <div class="mini-grid">
+          <div class="option-box"><b>直播互动课</b><span>实时跟练，教练在线答疑</span></div>
+          <div class="option-box"><b>录播训练包</b><span>永久回放，自定进度</span></div>
+          <div class="option-box"><b>打卡训练营</b><span>社群陪伴，监督打卡</span></div>
+          <div class="option-box"><b>企业定制课</b><span>员工福利，团体采购</span></div>
+        </div>
+      </div>
+      <div class="footer-note">线上课程支持微信/支付宝支付，购买后可在大屏/手机端观看，支持投屏。</div>
+    </section>
+
+    <!-- 我的页面 -->
+    <section class="page" id="page-profile">
+      <div class="profile-header">
+        <div class="profile-avatar" id="avatarDisplay">👤</div>
+        <div class="profile-name" id="nicknameDisplay">运动达人</div>
+        <p class="profile-phone">会员等级：白银会员</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>地址管理</span><span class="tag">配送/上门</span></div>
+        <div id="addressListContainer"></div>
+        <div class="add-address-btn" id="addAddressBtn">+ 新增地址</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>我的订单</span><span class="tag good">核销/追踪</span></div>
+        <button class="action-btn" id="myOrdersBtn">📋 查看全部订单 →</button>
+        <div class="footer-note">可查看线下/线上课程订单，点击核销出示二维码</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>教练端入口</span><span class="tag good">接单/收益</span></div>
+        <button class="action-btn" id="goToCoachBtn" style="margin-bottom:8px">进入教练工作台 →</button>
+        <div class="footer-note">查看订单、收益、入驻申请</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>后台管理入口</span><span class="tag warn">运营/数据</span></div>
+        <button class="action-btn" id="goToAdminBtn" style="margin-bottom:8px">进入运营后台 →</button>
+        <div class="footer-note">供需调度、财务结算、数据看板</div>
+      </div>
+    </section>
+
+    <!-- 教练端 - 添加返回按钮 -->
+    <section class="page" id="page-coach">
+      <div class="section hero">
+        <div class="hero-badge">教练入驻 / 审核 / 接单 / 收益</div>
+        <h2>教练端</h2>
+        <p>资质上传、背景核查、平台培训、订单日程同步、导航到场、核销收款与好评数据。</p>
+        <div class="hero-actions">
+          <button class="cta-btn" id="coachApplyBtn">入驻申请 →</button>
+          <button class="ghost-btn" id="coachTakeOrder">接单</button>
+          <button class="ghost-btn" id="coachBackToProfile" style="width:auto; padding:0 12px;">← 返回我的</button>
+        </div>
+      </div>
+      <div class="section grid-2"><div class="card"><div class="card-title"><span>入驻审核流程</span><span class="tag">合规</span></div><div class="timeline"><div class="step"><div class="step-dot">1</div><div><b>资料提交</b><span>身份证、教练证、运动经历、擅长项目、服务区域。</span></div></div><div class="step"><div class="step-dot">2</div><div><b>背景核查</b><span>风险筛查、教学经历复核、服务规范确认。</span></div></div><div class="step"><div class="step-dot">3</div><div><b>平台培训</b><span>履约规则、退款说明、安全预案、服务话术。</span></div></div></div></div><div class="card"><div class="card-title"><span>收益中心</span><span class="tag good">数据看板</span></div><p class="meta" style="margin:0 0 8px;font-size:12px;color:var(--muted);">当前教练身份（订单与收益按此身份统计）</p><select id="coachIdentitySelect" aria-label="当前教练" style="width:100%;padding:8px 10px;border-radius:12px;border:1px solid var(--line);margin-bottom:10px;font-size:13px;background:#fff;"></select><div class="stats"><div class="stat"><b id="coachStatOrders">0</b><span>关联订单数</span></div><div class="stat"><b id="coachStatRating">4.9</b><span>当前好评率</span></div><div class="stat"><b id="coachStatWithdraw">¥0.00</b><span>预计可提现</span></div></div><div class="toolbar"><button type="button" class="mini-btn" id="coachOrderDetailBtn">订单明细</button><button type="button" class="mini-btn" id="coachWithdrawBtn">提现申请</button></div></div></div>
+      <div class="section card"><div class="card-title"><span>教练接单列表</span><span class="tag">订单管理</span></div><div class="list" id="coachOrderList"><div class="item"><div class="left"><p class="name">篮球基础训练｜苏州大学操场</p><p class="meta">今天 16:00 - 17:00 · 学生用户 · 距离 1.2km</p></div><div class="badge">待接单</div></div><div class="item"><div class="left"><p class="name">体考专项冲刺｜上门服务</p><p class="meta">今天 19:00 - 20:00 · 社区用户 · 距离 2.4km</p></div><div class="badge">待确认</div></div><div class="item"><div class="left"><p class="name">瑜伽线上直播课</p><p class="meta">今晚 20:30 · 35 人预约 · 自动开播链接</p></div><div class="badge">线上</div></div></div></div>
+    </section>
+
+    <!-- 后台管理 - 添加返回按钮 -->
+    <section class="page" id="page-admin">
+      <div class="section hero">
+        <div class="hero-badge">平台后台 · 管理端</div>
+        <h2>后台管理与数据看板</h2>
+        <p>供需调度、订单财务管理、课程时段配置、拼团转化分析、会员增长。</p>
+        <div class="hero-actions">
+          <button class="cta-btn" id="adminAction">查看后台 →</button>
+          <button class="ghost-btn" id="financeAction">财务</button>
+          <button class="ghost-btn" id="adminBackToProfile" style="width:auto; padding:0 12px;">← 返回我的</button>
+        </div>
+      </div>
+      <div class="section grid-2" id="adminOverviewGrid">
+        <div class="card"><div class="card-title"><span>供需管理</span><span class="tag">运营核心</span></div><div class="list">
+          <div class="item admin-menu-entry" data-admin-panel="audit" role="button" tabindex="0"><div class="left"><p class="name">教练审核池</p><p class="meta">新申请与待复核教练资质，点击进入审核</p></div><div class="badge">进入</div></div>
+          <div class="item admin-menu-entry" data-admin-panel="courses" role="button" tabindex="0"><div class="left"><p class="name">课程上架管理</p><p class="meta">项目课与线上课上下架、适配配置</p></div><div class="badge">进入</div></div>
+          <div class="item admin-menu-entry" data-admin-panel="venues" role="button" tabindex="0"><div class="left"><p class="name">场地合作池</p><p class="meta">合作场地维护与合作状态</p></div><div class="badge">进入</div></div>
+        </div></div>
+        <div class="card"><div class="card-title"><span>订单 / 财务</span><span class="tag warn">资金流</span></div><div class="list">
+          <div class="item"><div class="left"><p class="name">交易流水</p><p class="meta">今日 GMV ¥12,860，退款率 2.1%</p></div><div class="badge">流水</div></div>
+          <div class="item"><div class="left"><p class="name">佣金结算</p><p class="meta">平台抽佣、教练分账、场地服务费</p></div><div class="badge">结算</div></div>
+          <div class="item admin-menu-entry" data-admin-panel="aftersale" role="button" tabindex="0"><div class="left"><p class="name">售后与退款</p><p class="meta">退款审批、投诉受理与处理说明</p></div><div class="badge">进入</div></div>
+        </div></div>
+      </div>
+      <div class="section card" id="adminOperatePanel" style="display:none;">
+        <div class="toolbar" style="margin-top:0;margin-bottom:4px">
+          <button type="button" class="mini-btn" id="adminOperateBack">← 返回概览</button>
+        </div>
+        <div class="card-title" style="margin-bottom:12px"><span id="adminOperateTitle">管理</span><span class="tag" id="adminOperateTag">操作</span></div>
+        <div id="adminOperateContent"></div>
+      </div>
+      <div class="section card"><div class="card-title"><span>数据看板</span><span class="tag good">数据展示</span></div><div class="stats"><div class="stat"><b>2,480</b><span>累计用户数</span></div><div class="stat"><b>36%</b><span>30 天复购率</span></div><div class="stat"><b>41%</b><span>拼团转化占比</span></div></div><div class="list"><div class="item"><div class="left"><p class="name">热门课程</p><p class="meta">体考训练、篮球基础、减脂体能、瑜伽塑形</p></div><div class="badge">Top4</div></div><div class="item"><div class="left"><p class="name">区域热度</p><p class="meta">校园宿舍区 ＞ 社区广场 ＞ 企业园区</p></div><div class="badge">热区</div></div></div></div>
+      <div class="section highlight-box"><b>三大核心增值模块</b><p>① 运动数据：打卡、时长、消耗、手环绑定。② 社区社交：动态、约课、话题、晒成绩。③ 会员体系：月卡、季卡、专属权益、复购激励。</p></div>
+    </section>
+
+    <!-- 融合搜索页 -->
+    <section class="page" id="page-search">
+      <div class="section" style="padding-top: 0;">
+        <div class="search-page-header">
+          <button class="back-btn" id="searchPageBackBtn">←</button>
+          <div class="search-input-area">
+            <span>🔍</span>
+            <input type="text" id="searchPageInput" placeholder="搜索教练、项目、拼团、线上课程" autocomplete="off" />
+          </div>
+        </div>
+        <div class="card" style="margin-bottom: 12px;">
+          <div class="card-title"><span>分类筛选</span><span class="tag">精准匹配</span></div>
+          <div class="filters" id="searchPageFilters">
+            <button class="tab active" data-filter="全部">全部</button>
+            <button class="tab" data-filter="教练">教练</button>
+            <button class="tab" data-filter="项目">项目</button>
+            <button class="tab" data-filter="拼团">拼团</button>
+            <button class="tab" data-filter="线上">线上</button>
+            <button class="tab" data-filter="体考">体考</button>
+          </div>
+        </div>
+        <div class="search-suggest" id="searchPageSuggests">
+          <button class="search-chip" data-key="篮球">篮球</button>
+          <button class="search-chip" data-key="游泳">游泳</button>
+          <button class="search-chip" data-key="羽毛球">羽毛球</button>
+          <button class="search-chip" data-key="网球">网球</button>
+          <button class="search-chip" data-key="体考">体考</button>
+          <button class="search-chip" data-key="线上直播">线上直播</button>
+          <button class="search-chip" data-key="拼团">拼团</button>
+          <button class="search-chip" data-key="瑜伽">瑜伽</button>
+        </div>
+        <div class="search-head" style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+          <div class="search-count" id="searchPageCount">共 0 条结果</div>
+          <div class="tag good" id="searchPageState">实时匹配</div>
+        </div>
+        <div class="list" id="searchPageResultList"></div>
+        <div class="footer-note" style="text-align:center;">点击「支付」快速下单，支持安全协议与订单管理</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="bottom-tabs">
+    <div class="bottom-inner">
+      <button class="nav-btn active" data-page="home"><div class="ico">🏠</div><div>首页</div></button>
+      <button class="nav-btn" data-page="booking"><div class="ico">🧾</div><div>预约</div></button>
+      <button class="nav-btn" data-page="groups"><div class="ico">👥</div><div>拼团</div></button>
+      <button class="nav-btn" data-page="online"><div class="ico">📱</div><div>线上课</div></button>
+      <button class="nav-btn" data-page="profile"><div class="ico">👤</div><div>我的</div></button>
+    </div>
+  </div>
+
+  <div class="overlay" id="modalOverlay"><div class="modal"><div class="mhead"><h3 id="modalTitle">弹窗标题</h3><p id="modalDesc">弹窗描述</p></div><div class="mbody" id="modalBody"></div><div class="mfoot" id="modalFoot"><button class="action-btn" id="modalMainBtn">确定</button><button class="secondary" id="closeModal">关闭</button></div></div></div>
+</div>
+
+<script>
+  // ===================== 原始数据定义 =====================
+  const coaches = [{id:'c1',type:'教练',name:'张教练｜篮球私教',category:'篮球',mode:'线下',distance:'0.8km',score:'4.9',price:128,desc:'投篮 / 运球 / 对抗基础',stock:'近2小时可约',location:'大学城东操场'},{id:'c2',type:'教练',name:'李教练｜体能训练',category:'体能',mode:'线下',distance:'1.3km',score:'4.8',price:118,desc:'减脂 / 核心 / 力量提升',stock:'今日剩3节',location:'体育馆西侧'},{id:'c3',type:'教练',name:'王教练｜瑜伽塑形',category:'瑜伽',mode:'线上+线下',distance:'2.0km',score:'4.9',price:99,desc:'拉伸修复 / 塑形 / 颈肩舒缓',stock:'今晚20:00开课',location:'线上直播 / 社区活动室'},{id:'c4',type:'教练',name:'赵教练｜青少年体考',category:'体考',mode:'线下',distance:'1.1km',score:'4.7',price:138,desc:'跑跳专项 / 耐力提升 / 中考体测',stock:'周末场次紧张',location:'校园田径场'},{id:'c5',type:'教练',name:'陈教练｜燃脂训练营',category:'线上',mode:'线上',distance:'全城可约',score:'4.9',price:59,desc:'线上直播团课',stock:'今晚8:30开播',location:'直播间'}];
+  const projects = [{id:'p1',type:'项目',name:'篮球一对一提升课',category:'篮球',mode:'线下',price:128,score:'4.8',desc:'60分钟专项动作纠正',extra:'热门时段：18:00-20:00'},{id:'p2',type:'项目',name:'体考800米冲刺计划',category:'体考',mode:'线下',price:138,score:'4.9',desc:'4周提升耐力和配速',extra:'近7日下单 36 单'},{id:'p3',type:'项目',name:'减脂塑形月卡',category:'体能',mode:'线上+线下',price:299,score:'4.7',desc:'线下周训 + 线上打卡结合',extra:'支持拼团'},{id:'p4',type:'项目',name:'瑜伽拉伸舒缓课',category:'瑜伽',mode:'线上',price:49,score:'4.9',desc:'40分钟直播跟练',extra:'今日19:30开课'},{id:'p5',type:'项目',name:'游泳基础入门到进阶课',category:'游泳',mode:'线下',price:149,score:'4.8',desc:'呼吸节奏 / 踏水推进 / 技术纠正',extra:'可选：初级/提高班'},{id:'p6',type:'项目',name:'羽毛球步法与击球专项训练',category:'羽毛球',mode:'线下',price:109,score:'4.7',desc:'接发球 / 后场拉吊 / 反手提升',extra:'近5日下单 28 单'},{id:'p7',type:'项目',name:'网球发球与底线控制提升课',category:'网球',mode:'线下',price:139,score:'4.9',desc:'发球稳定 / 旋转回球 / 线路控制',extra:'周末场次优先'}];
+  const venues = [{ id: 'v1', name: '公园球场', price1h: 59, price2h: 79, desc: '适合篮球/网球/羽毛球热身与训练' },{ id: 'v2', name: '操场球场', price1h: 69, price2h: 99, desc: '可选择场地时段，器材按约定提供' },{ id: 'v3', name: '小区空地', price1h: 39, price2h: 69, desc: '周边便利，适合体能/对抗/训练营' }];
+  const rentalProducts = [{ id: 'r1', name: '护具套装（护腕+护膝）', price: 39, desc: '适合减脂/体能/对抗训练' },{ id: 'r2', name: '球类训练器材（羽毛球/网球/篮球）', price: 29, desc: '包含基础球具与训练配套' },{ id: 'r3', name: '训练辅助器材（敏捷梯+锥桶）', price: 59, desc: '提升速度、协调性与线路控制' }];
+  const supplementProducts = [{ id: 's1', name: '运动水 500ml', price: 5, desc: '训练补水' },{ id: 's2', name: '运动毛巾', price: 9, desc: '汗巾/擦汗' },{ id: 's3', name: '护腕', price: 19, desc: '稳定手腕与防护' },{ id: 's4', name: '能量胶', price: 29, desc: '耐力训练能量补充' },{ id: 's5', name: '电解质饮料', price: 18, desc: '补充电解质' }];
+  const groups = [{id:'g1',type:'拼团',title:'体考冲刺 5 人团',detail:'还差 2 人成团 · 当前价预计 9 折',tag:'校园团',people:'已3/5人',price:'¥124/人'},{id:'g2',type:'拼团',title:'篮球基础 10 人团',detail:'已 8 人参团 · 满 10 人 8 折',tag:'社团团',people:'已8/10人',price:'¥103/人'},{id:'g3',type:'拼团',title:'减脂线上直播团',detail:'已 23 人参团 · 当前享 7 折',tag:'线上团',people:'已23/20人',price:'¥41/人'},{id:'g4',type:'拼团',title:'企业工间操 20 人团',detail:'待企业 HR 确认',tag:'企业团',people:'已12/20人',price:'¥79/人'}];
+  const onlineCourses = [{id:'o1',type:'线上',name:'7天宿舍燃脂训练营',category:'线上直播',mode:'线上',price:59,score:'4.8',desc:'每天20分钟直播 + 打卡社群 + 饮食建议',extra:'今晚20:30开营',duration:'7天',teacher:'陈教练',hot:true,previewVideo:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',calories:420},{id:'o2',type:'线上',name:'体考理论冲刺直播课',category:'体考',mode:'线上',price:39,score:'4.7',desc:'讲解测试技巧、配速策略和常见失误',extra:'明晚19:00开播',duration:'1.5小时',teacher:'赵老师',hot:true,previewVideo:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',calories:180},{id:'o3',type:'线上',name:'办公室肩颈舒缓课',category:'瑜伽',mode:'线上',price:29,score:'4.9',desc:'适合久坐人群，支持企业团购和员工福利采购',extra:'回放48小时',duration:'30分钟',teacher:'王老师',hot:false,previewVideo:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',calories:120},{id:'o4',type:'线上',name:'篮球运球大师课',category:'篮球',mode:'线上',price:99,score:'4.9',desc:'NBA训练师亲授，进阶控球技巧',extra:'永久回放',duration:'8节录播',teacher:'张教练',hot:true,previewVideo:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',calories:520},{id:'o5',type:'线上',name:'亲子瑜伽周末营',category:'瑜伽',mode:'线上',price:49,score:'4.8',desc:'家长与孩子一起运动，增进感情',extra:'直播+回放',duration:'4周',teacher:'李老师',hot:false,previewVideo:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',calories:260}];
+  const searchIndex = [...coaches.map(i=>({...i,title:i.name,subtitle:`${i.category} · ${i.mode} · ${i.distance}`,price:`¥${i.price}`,keyword:`${i.name} ${i.category} ${i.mode} ${i.desc} 教练`})), ...projects.map(i=>({...i,title:i.name,subtitle:`${i.category} · ${i.mode} · ${i.score}分`,price:`¥${i.price}`,keyword:`${i.name} ${i.category} 项目`})), ...groups.map(i=>({...i,title:i.title,subtitle:`${i.tag} · ${i.people}`,price:i.price,keyword:`${i.title} 拼团`})), ...onlineCourses.map(i=>({...i,title:i.name,subtitle:`${i.category} · ${i.duration} · ${i.score}分`,price:`¥${i.price}`,keyword:`${i.name} ${i.category} 线上 直播 课程`}))];
+
+  let createdGroups = [];
+  function loadCreatedGroupsFromStorage(){
+    const stored = localStorage.getItem('createdGroups');
+    if (stored) { try { createdGroups = JSON.parse(stored) || []; } catch (e) { createdGroups = []; } }
+    else { createdGroups = []; localStorage.setItem('createdGroups', JSON.stringify(createdGroups)); }
+  }
+  function saveCreatedGroupsToStorage(){ localStorage.setItem('createdGroups', JSON.stringify(createdGroups)); }
+
+  // 全局辅助函数
+  let userProfile = { nickname: '运动达人', avatar: '👤', phone: '138****8888', email: 'user@dongda.com', addresses: [{ id: 'a1', name: '家', phone: '138****1234', detail: '北京市朝阳区xx小区10号楼203' },{ id: 'a2', name: '学校', phone: '188****5678', detail: '大学城体育中心东门' }] };
+  let orders = [];
+  let supplementCart = {};
+  let groupDraft = null;
+  function saveOrdersToStorage(){ localStorage.setItem('sportsOrders', JSON.stringify(orders)); }
+  function loadOrdersFromStorage(){ const stored = localStorage.getItem('sportsOrders'); if(stored) orders = JSON.parse(stored); else orders = []; }
+  function saveProfileToStorage(){ localStorage.setItem('userProfile', JSON.stringify(userProfile)); }
+  function loadProfileFromStorage(){ const stored = localStorage.getItem('userProfile'); if(stored) userProfile = JSON.parse(stored); else localStorage.setItem('userProfile', JSON.stringify(userProfile)); updateProfileUI(); renderAddressList(); }
+  function updateProfileUI(){ 
+    const nicknameEl = document.getElementById('nicknameDisplay'); 
+    if(nicknameEl) {
+      nicknameEl.innerHTML = `${escapeHtml(userProfile.nickname)} <button id="editProfileEntry">编辑</button>`;
+      const editBtnEntry = document.getElementById('editProfileEntry');
+      if(editBtnEntry) editBtnEntry.onclick = openProfileEditModal;
+    }
+    const avatarEl = document.getElementById('avatarDisplay'); 
+    if(avatarEl) avatarEl.innerHTML = escapeHtml(userProfile.avatar); 
+  }
+  function renderAddressList(){ const container = document.getElementById('addressListContainer'); if(!container) return; if(!userProfile.addresses?.length){container.innerHTML='<div class="address-item">暂无地址，点击下方新增</div>'; return;} container.innerHTML = userProfile.addresses.map(addr => `<div class="address-item"><div class="address-info"><div class="address-name">${escapeHtml(addr.name)} ${escapeHtml(addr.phone)}</div><div class="address-detail">${escapeHtml(addr.detail)}</div></div><div class="address-actions"><button onclick="editAddress('${addr.id}')">编辑</button><button onclick="deleteAddress('${addr.id}')">删除</button></div></div>`).join(''); }
+  
+  // 增强的 openModal 函数（主按钮为「关闭」时不再显示底部第二个关闭，避免重复）
+  function openModal({title,desc,body,buttonText='确定',onConfirm,hideSecondary}){
+    const overlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalBody = document.getElementById('modalBody');
+    const modalMainBtn = document.getElementById('modalMainBtn');
+    const secondaryBtn = document.getElementById('closeModal');
+    const singleDismissBtns = ['关闭', '完成', '知道了'];
+    const hideSecond = hideSecondary === true || (hideSecondary !== false && singleDismissBtns.includes(buttonText));
+    modalTitle.textContent=title;
+    modalDesc.textContent=desc;
+    modalBody.innerHTML=body;
+    modalMainBtn.textContent=buttonText;
+    modalMainBtn.onclick=onConfirm||closeModal;
+    if(secondaryBtn) secondaryBtn.onclick = closeModal;
+    if(secondaryBtn) secondaryBtn.style.display = hideSecond ? 'none' : '';
+    overlay.classList.add('show');
+  }
+  function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+  function openSafetyAgreement(next){ openModal({title:'安全承诺书',desc:'支付前请先确认',body:`<div class="result-box">本人已知悉：如在上课时间内，学员因自身原因、既往疾病、隐瞒病史、不服从教练指导、私自进行高风险动作等导致受伤，由学员自行承担相应责任，教练无需承担由此产生的责任。<br><br>确认支付即视为已阅读并同意。</div>`,buttonText:'同意并继续支付',onConfirm:next}); }
+  function openPaymentSuccess(orderId,title='支付成功'){
+    openModal({title,desc:'订单已生成',body:`<div class="result-box">订单编号：${escapeHtml(orderId)}<br>可前往我的订单查看、退款或核销。</div>`,buttonText:'进入我的订单',onConfirm:()=>showOrdersModal()});
+    if (typeof renderMyOnlineClasses === 'function') renderMyOnlineClasses();
+  }
+  
+  // 订单管理模块
+  function showOrdersModal() {
+    loadOrdersFromStorage();
+    if (orders.length === 0) {
+      openModal({ title: '我的订单', desc: '暂无订单', body: '<div class="result-box">快去预约一节课程吧！</div>', buttonText: '关闭', onConfirm: closeModal });
+      return;
+    }
+    const orderHtml = orders.map(order => {
+      const actionBtn = order.verifyCode
+        ? `<button class="mini-btn" style="padding:6px 12px;" onclick="triggerVerification('${order.id}')">📱 核销二维码</button>`
+        : `<button class="mini-btn" style="padding:6px 12px;" onclick="viewOrderDetail('${order.id}')">查看详情</button>`;
+      return `<div class="order-item" style="margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:12px;"><div><b>${escapeHtml(order.courseName || order.coachName)}</b> <span style="font-size:12px;color:var(--muted)">${escapeHtml(order.type)}</span></div><div style="font-size:12px; margin:4px 0">教练：${escapeHtml(order.coachName)} | 时间：${escapeHtml(order.time)}</div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px"><span class="tag good">${escapeHtml(order.status)}</span>${actionBtn}</div></div>`;
+    }).join('');
+    openModal({ title: '📋 我的订单', desc: '点击核销可查看订单二维码', body: `<div style="max-height:55vh; overflow-y:auto;">${orderHtml}</div>`, buttonText: '关闭', onConfirm: closeModal });
+  }
+  window.viewOrderDetail = function(orderId) { const order=orders.find(o=>o.id===orderId); if(!order) return; openModal({ title:'订单详情', desc:escapeHtml(order.type||'订单'), body:`<div class="result-box"><b>${escapeHtml(order.courseName||order.coachName)}</b><br>状态：${escapeHtml(order.status)}<br>教练：${escapeHtml(order.coachName)}<br>时间：${escapeHtml(order.time)}<br>金额：¥${(order.price||0).toFixed(2)}<br>备注：${escapeHtml(order.detail||'')||'-'}</div>`, buttonText:'关闭', onConfirm:closeModal }); };
+  window.applyRefund = function(orderId) { const order=orders.find(o=>o.id===orderId); if(!order) return; openModal({ title:'申请退款', desc:'确认提交退款申请', body:`<div class="result-box">订单：${escapeHtml(order.courseName)}<br>金额：¥${(order.price||0).toFixed(2)}</div>`, buttonText:'确认申请', onConfirm:()=>{ order.status='退款审核中'; saveOrdersToStorage(); openModal({ title:'退款申请已提交', desc:'可在后台售后与退款中查看', body:'<div class="result-box">申请成功。</div>', buttonText:'完成', onConfirm:closeModal }); } }); };
+  window.triggerVerification = function(orderId) { const order=orders.find(o=>o.id===orderId); if(!order) return; const canvasId='qrCanvas'+Date.now(); const modalBodyHtml=`<div style="text-align:center;"><canvas id="${canvasId}" width="180" height="180" style="width:180px;height:180px; margin:0 auto; border-radius:16px; background:white; box-shadow:0 4px 12px rgba(0,0,0,0.1);"></canvas><div style="margin-top:16px; background:#f5f7fb; border-radius:16px; padding:12px; text-align:left;"><p><strong>🏋️ 教练</strong> ${escapeHtml(order.coachName)}</p><p><strong>📚 课程</strong> ${escapeHtml(order.courseName)}</p><p><strong>⏰ 时间</strong> ${escapeHtml(order.time)}</p><p><strong>🔑 核销码</strong> ${escapeHtml(order.verifyCode||('SPORT'+order.id.slice(-6)))}</p></div><p class="muted" style="margin-top:12px;">向教练出示此二维码，完成核销后课程生效</p><div style="margin-top:10px;"><button class="mini-btn" style="padding:6px 12px;" onclick="window.viewOrderDetail && window.viewOrderDetail('${order.id}')">申请退款</button></div></div>`;
+    openModal({ title:'订单核销二维码', desc:'请出示给教练扫码', body:modalBodyHtml, buttonText:'完成核销', onConfirm:()=>{ order.status='已核销'; saveOrdersToStorage(); openModal({ title:'核销成功', desc:'课程已生效', body:`<div class="result-box"><b>已核销</b><br>订单编号：${escapeHtml(order.id)}<br>状态：${escapeHtml(order.status)}</div>`, buttonText:'完成', onConfirm:closeModal }); } });
+    setTimeout(()=>{ const canvas=document.getElementById(canvasId); if(!canvas) return; const ctx=canvas.getContext('2d'); if(!ctx) return; ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,180,180); const block=9; const codeStr=`${order.coachName}|${order.courseName}|${order.time}|${order.verifyCode}`; for(let i=0;i<180;i+=block){for(let j=0;j<180;j+=block){const val=(i+j+codeStr.charCodeAt((i+j)%codeStr.length))%2; ctx.fillStyle=val===0?'#000000':'#f0f0f0'; ctx.fillRect(i,j,block-1,block-1);}} ctx.fillStyle='#2563eb'; ctx.font='bold 14px system-ui'; ctx.fillText('动达',65,95); },30);
+  };
+  function createPaidOrder({ type, coachName, courseName, time, price, detail }) { const newId='ORD'+Date.now(); const requireVerify=['场地预约','线下课','上门私教','拼团','器材租赁']; const needsVerification=requireVerify.includes(type); orders.push({ id:newId, coachName:coachName||'动达平台', courseName, time:time||'-', price:typeof price==='number'?price:Number(price||0), type, status:'已支付', verifyCode:needsVerification?'QR'+newId.slice(-6):undefined, detail:detail||'' }); saveOrdersToStorage(); return newId; }
+  /** 线上课页「我要上课」：仅展示已购且未退款的线上课程订单 */
+  function renderMyOnlineClasses(){
+    loadOrdersFromStorage();
+    const container = document.getElementById('myOnlineClassList');
+    if (!container) return;
+    const onlineList = orders.filter(o => o.type === '线上课程' && o.status !== '已退款');
+    if (onlineList.length === 0) {
+      container.innerHTML = '<div class="search-empty">暂无可用线上课。购买「精选线上课」并支付成功后，将出现在此处。</div>';
+      return;
+    }
+    container.innerHTML = onlineList.map(o => `
+      <div class="item">
+        <div class="left">
+          <p class="name">${escapeHtml(o.courseName || '线上课程')}</p>
+          <p class="meta">教练：${escapeHtml(o.coachName || '-')} · 下单：${escapeHtml(o.time || '-')}</p>
+          <p class="meta">订单：${escapeHtml(o.id)} · ${fmtMoney(o.price)}</p>
+        </div>
+        <button type="button" class="mini-btn" data-my-online-order="${escapeHtml(o.id)}">进入上课</button>
+      </div>
+    `).join('');
+    container.querySelectorAll('[data-my-online-order]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-my-online-order');
+        const order = orders.find(x => x.id === id);
+        if (order) openOnlineClassroom(order);
+      });
+    });
+  }
+  function openOnlineClassroom(order){
+    const course = onlineCourses.find(c => c.name === order.courseName);
+    const videoSrc = course?.previewVideo || '';
+    const extra = course
+      ? `时长：${escapeHtml(course.duration)} · 预计消耗约 ${course.calories} 千卡`
+      : '未匹配到课程详情，仍可查看订单信息。';
+    openModal({
+      title: '上课',
+      desc: escapeHtml(order.courseName || ''),
+      body: `
+        <div class="result-box">
+          <p style="margin:0 0 8px;font-weight:900;">${escapeHtml(order.courseName)}</p>
+          <p class="meta">教练：${escapeHtml(order.coachName)}</p>
+          <p class="meta">${extra}</p>
+          ${videoSrc ? `<video src="${videoSrc}" controls playsinline preload="metadata" style="width:100%;border-radius:14px;margin-top:12px;background:#000;"></video>` : '<p class="meta" style="margin-top:10px;">暂无关联视频，请稍后在课程更新中查看。</p>'}
+          <p class="meta" style="margin-top:10px;">订单号：${escapeHtml(order.id)}</p>
+        </div>
+      `,
+      buttonText: '关闭',
+      onConfirm: closeModal,
+      hideSecondary: true
+    });
+  }
+  function money(n) { const v=typeof n==='number'?n:Number(n||0); return v.toFixed(2); }
+  function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+
+  // ========== 个人资料编辑模态框（头像下拉选择） ==========
+  function openProfileEditModal() {
+    const avatarOptions = ['👤', '🏃', '🏀', '🏋️', '🧘', '🤸', '🚴', '⚽', '🏓', '🏆', '🔥', '💪', '🥗', '🤾', '🏊', '🕺', '🎾'];
+    const currentAvatar = userProfile.avatar || '👤';
+    const selectOptions = avatarOptions.map(emoji => `<option value="${emoji}" ${emoji === currentAvatar ? 'selected' : ''}>${emoji}</option>`).join('');
+    openModal({
+      title: '个人资料编辑',
+      desc: '修改您的资料',
+      body: `
+        <div class="formgrid">
+          <div class="field"><label>昵称</label><input id="editNick" value="${escapeHtml(userProfile.nickname)}" /></div>
+          <div class="field"><label>手机号</label><input id="editPhone" value="${escapeHtml(userProfile.phone || '')}" /></div>
+          <div class="field"><label>邮箱</label><input id="editEmail" value="${escapeHtml(userProfile.email || '')}" /></div>
+          <div class="field"><label>头像</label>
+            <select id="editAvatarSelect" style="width:100%; padding:10px; border-radius:12px; border:1px solid var(--line); background:#fff; font-size:18px;">
+              ${selectOptions}
+            </select>
+          </div>
+          <div class="field full"><div class="result-box">点击下拉框选择头像，保存后同步更新。</div></div>
+        </div>
+      `,
+      buttonText: '保存修改',
+      onConfirm: () => {
+        const newNick = document.getElementById('editNick')?.value.trim();
+        const newPhone = document.getElementById('editPhone')?.value;
+        const newEmail = document.getElementById('editEmail')?.value;
+        const newAvatar = document.getElementById('editAvatarSelect')?.value;
+        if (newNick) {
+          userProfile.nickname = newNick;
+          userProfile.avatar = newAvatar || '👤';
+          userProfile.phone = newPhone;
+          userProfile.email = newEmail;
+          saveProfileToStorage();
+          updateProfileUI();
+          closeModal();
+          openModal({ title: '更新成功', desc: '个人信息已更新', body: '<div class="result-box">✔️ 资料已保存</div>', buttonText: '完成', onConfirm: closeModal });
+        }
+      }
+    });
+  }
+
+  window.editAddress = function (id) {
+    const addr = userProfile.addresses.find(a => a.id === id);
+    if (!addr) return;
+    openModal({
+      title: '编辑地址',
+      desc: '修改联系人信息',
+      body: `<div class="formgrid"><div class="field"><label>联系人</label><input id="editAddrName" value="${escapeHtml(addr.name)}" /></div><div class="field"><label>手机号</label><input id="editAddrPhone" value="${escapeHtml(addr.phone)}" /></div><div class="field full"><label>详细地址</label><textarea id="editAddrDetail">${escapeHtml(addr.detail)}</textarea></div></div>`,
+      buttonText: '确认',
+      onConfirm: () => {
+        const newName = document.getElementById('editAddrName')?.value.trim();
+        const newPhone = document.getElementById('editAddrPhone')?.value.trim();
+        const newDetail = document.getElementById('editAddrDetail')?.value.trim();
+        if (newName && newPhone && newDetail) {
+          addr.name = newName;
+          addr.phone = newPhone;
+          addr.detail = newDetail;
+          saveProfileToStorage();
+          renderAddressList();
+        }
+        closeModal();
+      }
+    });
+  };
+  window.deleteAddress = function (id) {
+    const addr = userProfile.addresses.find(a => a.id === id);
+    if (!addr) return;
+    openModal({ title: '删除地址', desc: '确认删除该地址吗？', body: `<div class="result-box">联系人：${escapeHtml(addr.name)}<br>详细地址：${escapeHtml(addr.detail)}</div>`, buttonText: '确认删除', onConfirm: () => { userProfile.addresses = userProfile.addresses.filter(a => a.id !== id); saveProfileToStorage(); renderAddressList(); closeModal(); } });
+  };
+  function addAddress() {
+    openModal({
+      title: '新增地址', desc: '填写收货地址信息',
+      body: `<div class="formgrid"><div class="field"><label>联系人</label><input id="newAddrName" placeholder="张三" /></div><div class="field"><label>手机号</label><input id="newAddrPhone" placeholder="13800000000" /></div><div class="field full"><label>详细地址</label><textarea id="newAddrDetail" placeholder="xx区xx路xx号"></textarea></div></div>`,
+      buttonText: '确认',
+      onConfirm: () => {
+        const name = document.getElementById('newAddrName')?.value.trim();
+        const phone = document.getElementById('newAddrPhone')?.value.trim();
+        const detail = document.getElementById('newAddrDetail')?.value.trim();
+        if (name && phone && detail) { const newId = 'addr_' + Date.now(); userProfile.addresses.push({ id: newId, name, phone, detail }); saveProfileToStorage(); renderAddressList(); }
+        closeModal();
+      }
+    });
+  }
+
+  // ========== 教练端/后台管理增强面板 ==========
+  let coachAuditPool = [];
+  let approvedCoachMeta = {};
+  let customGroups = [];
+  let refundCases = [];
+  let transactions = [];
+  let courseShelfStatus = {};
+  let venueCoopStatus = {};
+  let courseShelfNotes = {};
+  let venueCoopNotes = {};
+
+  function initExtraStorage() {
+    const storedAudit = localStorage.getItem('coachAuditPool');
+    if (storedAudit) coachAuditPool = JSON.parse(storedAudit);
+    else coachAuditPool = [
+      {id:'ap1',name:'周教练',category:'羽毛球',phone:'13900001111',status:'待审核',cert:'国家二级羽毛球教练',resume:'校队训练3年',slots:['2026-03-27 10:00','2026-03-27 16:00']},
+      {id:'ap2',name:'孙教练',category:'游泳',phone:'13900002222',status:'待审核',cert:'游泳社会体育指导员',resume:'少儿游泳教学2年',slots:['2026-03-28 09:00','2026-03-28 15:00']}
+    ];
+    const storedMeta = localStorage.getItem('approvedCoachMeta');
+    if (storedMeta) approvedCoachMeta = JSON.parse(storedMeta);
+    else approvedCoachMeta = {};
+    const storedCustom = localStorage.getItem('customGroups');
+    if (storedCustom) customGroups = JSON.parse(storedCustom);
+    else customGroups = [];
+    const storedRefund = localStorage.getItem('refundCases');
+    if (storedRefund) refundCases = JSON.parse(storedRefund);
+    else refundCases = [
+      {id:'rf1',orderId:'DEMO1',type:'退款申请',status:'待处理',reason:'临时有事无法上课',handleNote:'',handleResult:''},
+      {id:'rf2',orderId:'DEMO2',type:'投诉',status:'待处理',reason:'希望调整开课时间',handleNote:'',handleResult:''}
+    ];
+    refundCases.forEach(r => { if (r.handleNote === undefined) r.handleNote = ''; if (r.handleResult === undefined) r.handleResult = ''; });
+    const storedShelf = localStorage.getItem('courseShelfStatus');
+    if (storedShelf) { try { courseShelfStatus = JSON.parse(storedShelf) || {}; } catch (e) { courseShelfStatus = {}; } }
+    else courseShelfStatus = {};
+    const storedVenueCoop = localStorage.getItem('venueCoopStatus');
+    if (storedVenueCoop) { try { venueCoopStatus = JSON.parse(storedVenueCoop) || {}; } catch (e) { venueCoopStatus = {}; } }
+    else venueCoopStatus = {};
+    projects.forEach(p => { const k = 'project:' + p.id; if (!courseShelfStatus[k]) courseShelfStatus[k] = 'on'; });
+    onlineCourses.forEach(o => { const k = 'online:' + o.id; if (!courseShelfStatus[k]) courseShelfStatus[k] = 'on'; });
+    venues.forEach(v => { if (!venueCoopStatus[v.id]) venueCoopStatus[v.id] = 'coop'; });
+    const storedShelfNotes = localStorage.getItem('courseShelfNotes');
+    if (storedShelfNotes) { try { courseShelfNotes = JSON.parse(storedShelfNotes) || {}; } catch (e) { courseShelfNotes = {}; } }
+    const storedVenueNotes = localStorage.getItem('venueCoopNotes');
+    if (storedVenueNotes) { try { venueCoopNotes = JSON.parse(storedVenueNotes) || {}; } catch (e) { venueCoopNotes = {}; } }
+    const storedTrans = localStorage.getItem('transactions');
+    if (storedTrans) transactions = JSON.parse(storedTrans);
+    else transactions = [];
+    coaches.forEach(c=>{
+      if(!approvedCoachMeta[c.id]) approvedCoachMeta[c.id] = {id:c.id,name:c.name,category:c.category,status:'已通过',slots:['2026-03-27 16:00','2026-03-28 10:00','2026-03-28 19:00'],rate:c.price||99};
+    });
+    persistExtra();
+  }
+  function persistExtra() {
+    localStorage.setItem('coachAuditPool', JSON.stringify(coachAuditPool));
+    localStorage.setItem('approvedCoachMeta', JSON.stringify(approvedCoachMeta));
+    localStorage.setItem('customGroups', JSON.stringify(customGroups));
+    localStorage.setItem('refundCases', JSON.stringify(refundCases));
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    localStorage.setItem('courseShelfStatus', JSON.stringify(courseShelfStatus));
+    localStorage.setItem('venueCoopStatus', JSON.stringify(venueCoopStatus));
+    localStorage.setItem('courseShelfNotes', JSON.stringify(courseShelfNotes));
+    localStorage.setItem('venueCoopNotes', JSON.stringify(venueCoopNotes));
+  }
+  function getAllApprovedCoaches() {
+    const builtins = coaches.map(c=>({id:c.id,name:c.name,category:c.category,price:c.price||99,desc:c.desc,location:c.location,slots:(approvedCoachMeta[c.id]||{}).slots||['2026-03-27 16:00']}));
+    const extras = coachAuditPool.filter(x=>x.status==='已通过').map(x=>({id:x.id,name:x.name,category:x.category,price:118,desc:x.resume,location:'平台待分配',slots:(approvedCoachMeta[x.id]||{slots:x.slots||[]}).slots||[]}));
+    return [...builtins, ...extras];
+  }
+  /** 收益中心 / 接单列表：当前登录教练身份（本地存储，可与下拉切换） */
+  function getCurrentCoachName() {
+    const approved = getAllApprovedCoaches();
+    if (!approved.length) return '';
+    let stored = localStorage.getItem('coachCurrentName');
+    if (stored && approved.some(c => c.name === stored)) return stored;
+    stored = approved[0].name;
+    localStorage.setItem('coachCurrentName', stored);
+    return stored;
+  }
+  function setCurrentCoachName(name) {
+    if (name) localStorage.setItem('coachCurrentName', name);
+  }
+  function openCoachOrderDetailModal() {
+    loadOrdersFromStorage();
+    const coachName = getCurrentCoachName();
+    if (!coachName) {
+      openModal({ title: '订单明细', desc: '暂无教练身份', body: '<div class="result-box">暂无已通过审核的教练，请先完成入驻或等待审核通过。</div>', buttonText: '关闭', onConfirm: closeModal, hideSecondary: true });
+      return;
+    }
+    const mine = orders.filter(o => o.coachName === coachName).sort((a, b) => String(b.time).localeCompare(String(a.time)));
+    if (!mine.length) {
+      openModal({ title: '订单明细', desc: coachName, body: '<div class="result-box">暂无关联订单。学员预约并支付后，将在此展示所教课程与上课费用。</div>', buttonText: '关闭', onConfirm: closeModal, hideSecondary: true });
+      return;
+    }
+    const sum = mine.reduce((a, b) => a + Number(b.price || 0), 0);
+    const rows = mine.map(o => `
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:8px 6px;vertical-align:top">${escapeHtml(o.courseName || o.coachName || '-')}</td>
+        <td style="padding:8px 6px;font-size:12px;color:var(--muted)">${escapeHtml(o.type || '-')}</td>
+        <td style="padding:8px 6px;font-size:12px">${escapeHtml(o.time || '-')}</td>
+        <td style="padding:8px 6px;text-align:right;font-weight:700">${fmtMoney(o.price)}</td>
+        <td style="padding:8px 6px;font-size:12px">${escapeHtml(o.status || '-')}</td>
+      </tr>
+    `).join('');
+    openModal({
+      title: '订单明细',
+      desc: coachName + ' · 共 ' + mine.length + ' 笔 · 订单金额合计 ' + fmtMoney(sum),
+      body: `<div style="max-height:56vh;overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:var(--muted);font-size:12px"><th style="padding:8px 6px">课程</th><th style="padding:8px 6px">类型</th><th style="padding:8px 6px">时间</th><th style="padding:8px 6px;text-align:right">上课费用</th><th style="padding:8px 6px">状态</th></tr></thead><tbody>${rows}</tbody></table><p class="meta" style="margin:10px 0 0;font-size:12px">上课费用即订单实付金额；结算时按平台规则扣除抽成。</p></div>`,
+      buttonText: '关闭',
+      onConfirm: closeModal,
+      hideSecondary: true
+    });
+  }
+  function openCoachWithdrawModal() {
+    loadOrdersFromStorage();
+    const coachName = getCurrentCoachName();
+    const mine = orders.filter(o => o.coachName === coachName);
+    const sum = mine.reduce((a, b) => a + Number(b.price || 0), 0);
+    const platform = sum * 0.05;
+    const settle = sum - platform;
+    openModal({
+      title: '提现申请',
+      desc: coachName || '当前教练',
+      body: `<div class="result-box">订单累计：${fmtMoney(sum)}<br>平台抽成 5%：${fmtMoney(platform)}<br>预计可提现：<b>${fmtMoney(settle)}</b><br><span style="font-size:12px;color:var(--muted)">与收益中心「预计可提现」一致；提交后进入财务审核。</span></div>`,
+      buttonText: '确认提交',
+      onConfirm: () => openModal({ title: '已提交', desc: '提现申请', body: '<div class="result-box">提现申请已记录，请留意通知。</div>', buttonText: '完成', onConfirm: closeModal, hideSecondary: true })
+    });
+  }
+  function addTransaction(order, kind='支付') {
+    transactions.unshift({id:'TX'+Date.now(), kind, title:order.courseName||order.coachName, amount:order.price||0, status:order.status||'已支付', time:new Date().toLocaleString()});
+    persistExtra();
+  }
+  const originalCreatePaidOrder = createPaidOrder;
+  createPaidOrder = function(payload){
+    const id = originalCreatePaidOrder(payload);
+    const order = orders.find(o=>o.id===id);
+    if(order){
+      order.status = '待核销';
+      order.verifyCode = order.verifyCode || ('HX'+String(Date.now()).slice(-6));
+      saveOrdersToStorage();
+      addTransaction(order,'支付');
+    }
+    return id;
+  };
+  window.createPaidOrder = createPaidOrder;
+
+  function renderDynamicGroups() {
+    const el = document.getElementById('groupActivityList');
+    if(!el) return;
+    const list=[...createdGroups,...customGroups,...groups];
+    el.innerHTML = list.map(g=>`<div class="item fake-link" data-gid="${g.id}"><div class="left"><p class="name">${escapeHtml(g.title)}</p><p class="meta">${escapeHtml(g.detail)} · ${escapeHtml(g.people||'附近可拼')}</p></div><div class="badge">查看</div></div>`).join('');
+    document.querySelectorAll('[data-gid]',el).forEach(node=>node.onclick=()=>openGroupDetail(node.dataset.gid));
+  }
+  function openGroupDetail(id){
+    const g=[...createdGroups,...customGroups,...groups].find(x=>x.id===id); if(!g) return;
+    openModal({
+      title:'活动信息',
+      desc:'查看拼团详情并可直接参团',
+      body:`<div class="result-box"><b>${escapeHtml(g.title)}</b><br>${escapeHtml(g.detail)}<br>进度：${escapeHtml(g.people||'待成团')}<br>价格：${escapeHtml(g.price||'¥99/人')}</div>`,
+      buttonText:'去参团',
+      onConfirm:()=>{
+        const price = Number(String(g.price||99).replace(/[^\d.]/g,''))||99;
+        openSafetyAgreement(()=>{
+          const orderId=createPaidOrder({type:'拼团订单',coachName:'拼团教练待分配',courseName:g.title,time:new Date().toLocaleString(),price,detail:g.detail});
+          openPaymentSuccess(orderId,'拼团下单成功');
+        });
+      }
+    });
+  }
+
+  function courseShelfKey(kind, id) { return kind + ':' + id; }
+  function closeAdminOperatePanel() {
+    const p = document.getElementById('adminOperatePanel');
+    const g = document.getElementById('adminOverviewGrid');
+    if (p) { p.style.display = 'none'; delete p.dataset.adminPanelMode; }
+    if (g) g.style.display = '';
+  }
+  function renderAdminAuditOperate(container) {
+    if (!container) return;
+    if (!coachAuditPool.length) {
+      container.innerHTML = '<div class="result-box">暂无待处理申请。</div>';
+      return;
+    }
+    container.innerHTML = coachAuditPool.map(a => `<div class="item" style="flex-wrap:wrap;gap:10px"><div class="left" style="flex:1;min-width:200px"><p class="name">${escapeHtml(a.name)}｜${escapeHtml(a.category)}</p><p class="meta">${escapeHtml(a.cert)} · ${escapeHtml(a.phone)} · <b>${escapeHtml(a.status)}</b>${a.rejectReason ? '<br>驳回说明：' + escapeHtml(a.rejectReason) : ''}</p></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${a.status === '待审核' ? `<button type="button" class="inline-btn" data-ap-pass="${escapeHtml(a.id)}">通过</button><button type="button" class="inline-btn" data-ap-reject="${escapeHtml(a.id)}">不通过</button>` : `<span class="tag ${a.status === '已通过' ? 'good' : 'warn'}">${escapeHtml(a.status)}</span>`}</div></div>`).join('');
+    container.querySelectorAll('[data-ap-pass]').forEach(b => {
+      b.onclick = () => {
+        const x = coachAuditPool.find(i => i.id === b.getAttribute('data-ap-pass'));
+        if (!x) return;
+        x.status = '已通过';
+        approvedCoachMeta[x.id] = { id: x.id, name: x.name, category: x.category, status: '已通过', slots: x.slots?.length ? x.slots : ['2026-03-29 14:00'], rate: 118 };
+        persistExtra();
+        renderCoachAdminPanels();
+        renderAdminAuditOperate(container);
+      };
+    });
+    container.querySelectorAll('[data-ap-reject]').forEach(b => {
+      b.onclick = () => {
+        const x = coachAuditPool.find(i => i.id === b.getAttribute('data-ap-reject'));
+        if (!x) return;
+        openModal({
+          title: '审核不通过',
+          desc: escapeHtml(x.name),
+          body: `<div class="formgrid"><div class="field full"><label>不通过原因</label><textarea id="auditRejectReason" placeholder="请填写原因，将记录在案"></textarea></div></div>`,
+          buttonText: '确认不通过',
+          onConfirm: () => {
+            const note = document.getElementById('auditRejectReason')?.value.trim();
+            if (!note) { alert('请填写不通过原因'); return; }
+            x.status = '不通过';
+            x.rejectReason = note;
+            persistExtra();
+            closeModal();
+            renderCoachAdminPanels();
+            renderAdminAuditOperate(document.getElementById('adminOperateContent'));
+          }
+        });
+      };
+    });
+  }
+  function renderAdminCoursesOperate(container) {
+    if (!container) return;
+    const rows = [...projects.map(p => ({ kind: 'project', ...p })), ...onlineCourses.map(o => ({ kind: 'online', ...o }))];
+    container.innerHTML = '<p class="footer-note" style="margin:0 0 12px">点击课程打开详情，可选择<strong>上架</strong>或<strong>下架</strong>并填写备注。</p><div class="list" id="adminCourseShelfInner"></div>';
+    const inner = document.getElementById('adminCourseShelfInner');
+    inner.innerHTML = rows.map(c => {
+      const k = courseShelfKey(c.kind, c.id);
+      const on = (courseShelfStatus[k] || 'on') === 'on';
+      return `<div class="item fake-link" data-shelf-kind="${c.kind}" data-shelf-id="${c.id}" style="cursor:pointer"><div class="left"><p class="name">${escapeHtml(c.name)}</p><p class="meta">${escapeHtml(c.category)} · ${escapeHtml(c.mode || c.type)} · ${fmtMoney(c.price)}</p></div><div class="badge">${on ? '上架中' : '已下架'}</div></div>`;
+    }).join('');
+    inner.querySelectorAll('[data-shelf-kind]').forEach(el => {
+      el.onclick = () => openCourseShelfDetailModal(el.getAttribute('data-shelf-kind'), el.getAttribute('data-shelf-id'));
+    });
+  }
+  function openCourseShelfDetailModal(kind, id) {
+    const list = kind === 'project' ? projects : onlineCourses;
+    const c = list.find(x => x.id === id);
+    if (!c) return;
+    const k = courseShelfKey(kind, id);
+    const cur = (courseShelfStatus[k] || 'on') === 'on';
+    const prevNote = courseShelfNotes[k] || '';
+    openModal({
+      title: '课程上架管理',
+      desc: escapeHtml(c.name),
+      body: `<div class="formgrid"><div class="field full"><label>当前状态</label><div class="result-box" id="shelfStateHint">${cur ? '已上架，用户端可展示/购买' : '已下架，用户端隐藏'}</div></div><div class="field full"><label>操作</label><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="action-btn" style="flex:1;min-width:120px" id="btnShelfOn">设为上架</button><button type="button" class="secondary" style="flex:1;min-width:120px;border-radius:14px;font-weight:800;cursor:pointer;padding:12px" id="btnShelfOff">设为下架</button></div></div><div class="field full"><label>备注（选填）</label><textarea id="shelfNoteInput" placeholder="操作说明，后台留痕">${escapeHtml(prevNote)}</textarea></div></div>`,
+      buttonText: '关闭',
+      onConfirm: closeModal
+    });
+    setTimeout(() => {
+      const save = (state) => {
+        courseShelfStatus[k] = state;
+        const n = document.getElementById('shelfNoteInput')?.value.trim();
+        if (n) courseShelfNotes[k] = n;
+        else delete courseShelfNotes[k];
+        persistExtra();
+        closeModal();
+        const cont = document.getElementById('adminOperateContent');
+        if (cont && document.getElementById('adminOperatePanel')?.style.display !== 'none') renderAdminCoursesOperate(cont);
+        renderCoachAdminPanels();
+      };
+      document.getElementById('btnShelfOn')?.addEventListener('click', () => save('on'));
+      document.getElementById('btnShelfOff')?.addEventListener('click', () => save('off'));
+    }, 0);
+  }
+  function renderAdminVenuesOperate(container) {
+    if (!container) return;
+    container.innerHTML = '<p class="footer-note" style="margin:0 0 12px">点击场地打开详情，可选择<strong>合作</strong>或<strong>不合作</strong>并填写说明。</p><div class="list" id="adminVenueInner"></div>';
+    const inner = document.getElementById('adminVenueInner');
+    inner.innerHTML = venues.map(v => {
+      const coop = (venueCoopStatus[v.id] || 'coop') === 'coop';
+      return `<div class="item fake-link" data-venue-row="${escapeHtml(v.id)}" style="cursor:pointer"><div class="left"><p class="name">${escapeHtml(v.name)}</p><p class="meta">${escapeHtml(v.desc)} · 单小时 ${fmtMoney(v.price1h)}</p></div><div class="badge">${coop ? '合作中' : '不合作'}</div></div>`;
+    }).join('');
+    inner.querySelectorAll('[data-venue-row]').forEach(el => {
+      el.onclick = () => openVenueCoopDetailModal(el.getAttribute('data-venue-row'));
+    });
+  }
+  function openVenueCoopDetailModal(venueId) {
+    const v = venues.find(x => x.id === venueId);
+    if (!v) return;
+    const coop = (venueCoopStatus[v.id] || 'coop') === 'coop';
+    const prevNote = venueCoopNotes[v.id] || '';
+    openModal({
+      title: '场地合作池',
+      desc: escapeHtml(v.name),
+      body: `<div class="formgrid"><div class="field full"><label>当前状态</label><div class="result-box">${coop ? '合作中，可预约与结算' : '不合作，用户端不推荐'}</div></div><div class="field full"><label>操作</label><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="action-btn" style="flex:1;min-width:120px" id="btnVenueCoop">设为合作</button><button type="button" class="secondary" style="flex:1;min-width:120px;border-radius:14px;font-weight:800;cursor:pointer;padding:12px" id="btnVenueStop">设为不合作</button></div></div><div class="field full"><label>说明（选填）</label><textarea id="venueCoopNoteInput" placeholder="合作变更说明">${escapeHtml(prevNote)}</textarea></div></div>`,
+      buttonText: '关闭',
+      onConfirm: closeModal
+    });
+    setTimeout(() => {
+      const save = (state) => {
+        venueCoopStatus[v.id] = state;
+        const n = document.getElementById('venueCoopNoteInput')?.value.trim();
+        if (n) venueCoopNotes[v.id] = n;
+        else delete venueCoopNotes[v.id];
+        persistExtra();
+        closeModal();
+        const cont = document.getElementById('adminOperateContent');
+        if (cont && document.getElementById('adminOperatePanel')?.style.display !== 'none') renderAdminVenuesOperate(cont);
+        renderCoachAdminPanels();
+      };
+      document.getElementById('btnVenueCoop')?.addEventListener('click', () => save('coop'));
+      document.getElementById('btnVenueStop')?.addEventListener('click', () => save('none'));
+    }, 0);
+  }
+  function isComplaintCase(r) { return r.type && String(r.type).indexOf('投诉') !== -1; }
+  function openRefundCaseDetailModal(r) {
+    if (!r) return;
+    if (r.status !== '待处理') {
+      openModal({ title: '工单详情', desc: escapeHtml(r.type), body: `<div class="result-box">订单：${escapeHtml(r.orderId)}<br>用户说明：${escapeHtml(r.reason)}<br>处理结果：<b>${escapeHtml(r.handleResult || '-')}</b><br>处理说明：${escapeHtml(r.handleNote || '无')}</div>`, buttonText: '关闭', onConfirm: closeModal });
+      return;
+    }
+    const isComp = isComplaintCase(r);
+    const actionsHtml = isComp
+      ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button type="button" class="action-btn" style="flex:1;min-width:120px" id="btnComplaintAccept">受理</button><button type="button" class="secondary" style="flex:1;min-width:120px;border-radius:14px;font-weight:800;cursor:pointer;padding:12px" id="btnComplaintDeny">不受理</button></div>`
+      : `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button type="button" class="action-btn" style="flex:1;min-width:120px" id="btnRefundPass">通过</button><button type="button" class="secondary" style="flex:1;min-width:120px;border-radius:14px;font-weight:800;cursor:pointer;padding:12px" id="btnRefundReject">不通过</button></div>`;
+    openModal({
+      title: isComp ? '投诉处理' : '退款处理',
+      desc: '订单 ' + escapeHtml(r.orderId),
+      body: `<div class="formgrid"><div class="field full"><label>用户原因 / 说明</label><div class="result-box">${escapeHtml(r.reason)}</div></div><div class="field full"><label>处理说明（不通过 / 不受理时必填）</label><textarea id="aftersaleHandleNote" placeholder="请填写处理意见、依据或驳回原因"></textarea></div>${actionsHtml}</div>`,
+      buttonText: '关闭',
+      onConfirm: closeModal
+    });
+    setTimeout(() => {
+      const apply = (handleResult, needNoteForNegative) => {
+        const note = document.getElementById('aftersaleHandleNote')?.value.trim() || '';
+        if (needNoteForNegative && !note) { alert('请填写处理说明'); return; }
+        r.handleResult = handleResult;
+        r.handleNote = note;
+        if (isComp) {
+          r.status = handleResult === '受理' ? '投诉已受理' : '投诉不受理';
+        } else {
+          if (handleResult === '通过') {
+            r.status = '已通过';
+            const order = orders.find(o => o.id === r.orderId);
+            if (order) { order.status = '已退款'; saveOrdersToStorage(); addTransaction(order, '退款'); }
+          } else {
+            r.status = '已驳回';
+          }
+        }
+        persistExtra();
+        closeModal();
+        const cont = document.getElementById('adminOperateContent');
+        if (cont && document.getElementById('adminOperatePanel')?.style.display !== 'none') renderAdminAftersaleOperate(cont);
+        renderCoachAdminPanels();
+      };
+      if (isComp) {
+        document.getElementById('btnComplaintAccept')?.addEventListener('click', () => apply('受理', false));
+        document.getElementById('btnComplaintDeny')?.addEventListener('click', () => apply('不受理', true));
+      } else {
+        document.getElementById('btnRefundPass')?.addEventListener('click', () => apply('通过', false));
+        document.getElementById('btnRefundReject')?.addEventListener('click', () => apply('不通过', true));
+      }
+    }, 0);
+  }
+  function renderAdminAftersaleOperate(container) {
+    if (!container) return;
+    if (!refundCases.length) {
+      container.innerHTML = '<div class="result-box">暂无售后工单。</div>';
+      return;
+    }
+    container.innerHTML = '<p class="footer-note" style="margin:0 0 12px">点击工单处理：<strong>退款</strong>可选通过/不通过；<strong>投诉</strong>可选受理/不受理。均需填写处理说明（不通过/不受理时必填）。</p><div class="list" id="adminAftersaleInner"></div>';
+    const inner = document.getElementById('adminAftersaleInner');
+    inner.innerHTML = refundCases.map(r => `<div class="item fake-link" data-refund-id="${escapeHtml(r.id)}" style="cursor:pointer"><div class="left"><p class="name">${escapeHtml(r.type)}</p><p class="meta">订单 ${escapeHtml(r.orderId)} · ${escapeHtml(r.reason)}</p></div><div class="badge">${escapeHtml(r.status)}</div></div>`).join('');
+    inner.querySelectorAll('[data-refund-id]').forEach(el => {
+      el.onclick = () => {
+        const r = refundCases.find(x => x.id === el.getAttribute('data-refund-id'));
+        if (r) openRefundCaseDetailModal(r);
+      };
+    });
+  }
+  function openAdminOperatePanel(mode) {
+    const p = document.getElementById('adminOperatePanel');
+    const g = document.getElementById('adminOverviewGrid');
+    const title = document.getElementById('adminOperateTitle');
+    const tag = document.getElementById('adminOperateTag');
+    const body = document.getElementById('adminOperateContent');
+    if (!p || !body || !title || !tag) return;
+    p.dataset.adminPanelMode = mode;
+    if (g) g.style.display = 'none';
+    p.style.display = 'block';
+    const map = {
+      audit: { t: '教练审核池', tg: '资质审核', fn: renderAdminAuditOperate },
+      courses: { t: '课程上架管理', tg: '上下架', fn: renderAdminCoursesOperate },
+      venues: { t: '场地合作池', tg: '合作状态', fn: renderAdminVenuesOperate },
+      aftersale: { t: '售后与退款', tg: '工单', fn: renderAdminAftersaleOperate }
+    };
+    const m = map[mode];
+    if (!m) return;
+    title.textContent = m.t;
+    tag.textContent = m.tg;
+    m.fn(body);
+    setTimeout(() => p.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+  function bindAdminOperateMenu() {
+    document.querySelectorAll('.admin-menu-entry[data-admin-panel]').forEach(el => {
+      el.addEventListener('click', () => openAdminOperatePanel(el.getAttribute('data-admin-panel')));
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } });
+    });
+    document.getElementById('adminOperateBack')?.addEventListener('click', closeAdminOperatePanel);
+  }
+
+  function renderCoachAdminPanels() {
+    const coachPage = document.getElementById('page-coach');
+    const adminPage = document.getElementById('page-admin');
+    if(!coachPage||!adminPage) return;
+    if(!document.getElementById('coachDynamicPanel')){
+      coachPage.insertAdjacentHTML('beforeend', `<div class="section card dynamic-section" id="coachDynamicPanel"><div class="card-title"><span>时间课程表</span><span class="tag good">可接单时间</span></div><div id="coachScheduleList"></div></div><div class="section card dynamic-section"><div class="card-title"><span>佣金结算</span><span class="tag warn">平台抽成5%</span></div><div id="coachCommissionBox"></div></div>`);
+    }
+    if(!document.getElementById('adminDynamicPanel')){
+      adminPage.insertAdjacentHTML('beforeend', `<div class="section card dynamic-section" id="adminDynamicPanel"><div class="card-title"><span>交易流水</span><span class="tag warn">快速查看</span></div><div id="transListPreview"></div></div>`);
+    }
+    const transEl = document.getElementById('transListPreview');
+    if(transEl) {
+      transEl.innerHTML = (transactions.slice(0,4).map(t=>`<div class="item fake-link" data-open-trans="1"><div class="left"><p class="name">${escapeHtml(t.title)}</p><p class="meta">${escapeHtml(t.kind)} · ${fmtMoney(t.amount)} · ${escapeHtml(t.time)}</p></div><div class="badge">${escapeHtml(t.status)}</div></div>`).join('') || '<div class="result-box">暂无交易流水</div>');
+      transEl.onclick=()=>openModal({title:'交易流水',desc:'交易记录',body:`<div style="max-height:56vh;overflow:auto">${transactions.map(t=>`<div class="order-item"><b>${escapeHtml(t.title)}</b><div class="small-note">${escapeHtml(t.kind)} · ${fmtMoney(t.amount)} · ${escapeHtml(t.time)} · ${escapeHtml(t.status)}</div></div>`).join('') || '<div class="result-box">暂无交易</div>'}</div>`,buttonText:'关闭',onConfirm:closeModal});
+    }
+    if (document.getElementById('adminOperatePanel')?.style.display !== 'none') {
+      const mode = document.getElementById('adminOperatePanel')?.dataset.adminPanelMode;
+      const cont = document.getElementById('adminOperateContent');
+      if (cont && mode === 'audit') renderAdminAuditOperate(cont);
+      else if (cont && mode === 'courses') renderAdminCoursesOperate(cont);
+      else if (cont && mode === 'venues') renderAdminVenuesOperate(cont);
+      else if (cont && mode === 'aftersale') renderAdminAftersaleOperate(cont);
+    }
+    loadOrdersFromStorage();
+    const approved = getAllApprovedCoaches();
+    const sel = document.getElementById('coachIdentitySelect');
+    if (sel) {
+      if (approved.length) {
+        const cur = getCurrentCoachName();
+        sel.innerHTML = approved.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)} · ${escapeHtml(c.category)}</option>`).join('');
+        sel.value = approved.some(c => c.name === cur) ? cur : approved[0].name;
+        if (sel.value !== cur) setCurrentCoachName(sel.value);
+      } else {
+        sel.innerHTML = '';
+      }
+    }
+    const currentName = getCurrentCoachName();
+    const coachOrders = orders.filter(o => o.coachName === currentName);
+    const statOrd = document.getElementById('coachStatOrders');
+    const statWd = document.getElementById('coachStatWithdraw');
+    if (statOrd) statOrd.textContent = String(coachOrders.length);
+    if (statWd) {
+      const sumCoach = coachOrders.reduce((a, b) => a + Number(b.price || 0), 0);
+      statWd.textContent = fmtMoney(sumCoach * 0.95);
+    }
+    const sched = document.getElementById('coachScheduleList');
+    if (sched) {
+      const row = approved.find(c => c.name === currentName);
+      if (row) {
+        sched.innerHTML = `<div class="item"><div class="left"><p class="name">${escapeHtml(row.name)}</p><p class="meta">${escapeHtml(row.category)} · 可接单时间：${escapeHtml((approvedCoachMeta[row.id]?.slots || row.slots || []).join('，') || '未设置')}</p></div><button type="button" class="inline-btn" data-edit-slot="${escapeHtml(row.id)}">编辑时间</button></div>`;
+        document.querySelectorAll('[data-edit-slot]', sched).forEach(b => { b.onclick = () => editCoachSlots(b.getAttribute('data-edit-slot')); });
+      } else {
+        sched.innerHTML = approved.length ? '<div class="result-box">请在上方选择当前教练身份</div>' : '<div class="result-box">暂无已通过审核的教练</div>';
+      }
+    }
+    const orderListEl = document.getElementById('coachOrderList');
+    if (orderListEl) {
+      orderListEl.innerHTML = coachOrders.map(o => `<div class="item"><div class="left"><p class="name">${escapeHtml(o.courseName || '-')}</p><p class="meta">${escapeHtml(o.type || '')} · ${escapeHtml(o.time)} · 上课费用 ${fmtMoney(o.price)} · ${escapeHtml(o.status)}</p></div><div class="badge">${escapeHtml(o.status)}</div></div>`).join('') || '<div class="item"><div class="left"><p class="name">暂无订单</p><p class="meta">学员支付后，所教课程与费用将显示于此</p></div><div class="badge">—</div></div>';
+    }
+    const commissionEl = document.getElementById('coachCommissionBox');
+    if(commissionEl){
+      const sum = coachOrders.reduce((a,b)=>a+Number(b.price||0),0);
+      const platform = sum*0.05; const settle = sum-platform;
+      commissionEl.innerHTML = `<div class="result-box">订单总额：${fmtMoney(sum)}<br>平台抽成5%：${fmtMoney(platform)}<br>教练可结算：<b>${fmtMoney(settle)}</b></div><div style="margin-top:10px"><button class="action-btn" id="coachSettleBtn">申请结算</button></div>`;
+      document.getElementById('coachSettleBtn')?.addEventListener('click',()=>openModal({title:'佣金结算',desc:'结算结果',body:`<div class="result-box">结算金额：${fmtMoney(settle)}<br>抽成：${fmtMoney(platform)}<br>状态：已提交结算申请</div>`,buttonText:'完成',onConfirm:closeModal}));
+    }
+  }
+  function editCoachSlots(coachId){
+    const meta=approvedCoachMeta[coachId] || {slots:[]};
+    openModal({title:'编辑可接单时间',desc:'审核通过后需设置可接单时间',body:`<div class="formgrid"><div class="field full"><label>时间1</label><input id="slot1" value="${escapeHtml(meta.slots?.[0]||'2026-03-29 10:00')}"></div><div class="field full"><label>时间2</label><input id="slot2" value="${escapeHtml(meta.slots?.[1]||'2026-03-29 16:00')}"></div><div class="field full"><label>时间3</label><input id="slot3" value="${escapeHtml(meta.slots?.[2]||'2026-03-29 19:00')}"></div></div>`,buttonText:'保存',onConfirm:()=>{approvedCoachMeta[coachId]={...(approvedCoachMeta[coachId]||{}),slots:[document.getElementById('slot1').value,document.getElementById('slot2').value,document.getElementById('slot3').value].filter(Boolean)}; persistExtra(); renderCoachAdminPanels(); closeModal();}});
+  }
+  
+  // 设置卡片（账号管理）
+  function injectSettingsCard() {
+    const profile = document.getElementById('page-profile');
+    if(!profile || document.getElementById('settingsEntryCard')) return;
+    const node = document.createElement('div');
+    node.className='card'; node.id='settingsEntryCard';
+    node.innerHTML = `
+      <div class="card-title"><span>切换账号</span><span class="tag">账号操作</span></div>
+      <div class="mini-grid" style="margin-top: 8px;">
+        <button class="action-btn" id="btnRegister">注册账号</button>
+        <button class="action-btn" id="btnLogin">登录账号</button>
+        <button class="action-btn" id="btnSwitch">切换账号</button>
+        <button class="action-btn" id="btnLogout">注销账号</button>
+      </div>
+    `;
+    profile.appendChild(node);
+    
+    document.getElementById('btnRegister').onclick = () => {
+      openModal({
+        title: '注册账号',
+        desc: '填写信息完成注册（演示态）',
+        body: `<div class="formgrid"><div class="field"><label>手机号</label><input id="regPhone" placeholder="请输入手机号" /></div><div class="field"><label>验证码</label><input id="regCode" placeholder="请输入验证码" /></div><div class="field full"><label>密码</label><input id="regPwd" type="password" placeholder="设置密码" /></div><div class="field full"><div class="result-box">演示功能，点击确认后模拟注册成功。</div></div></div>`,
+        buttonText: '确认注册',
+        onConfirm: () => {
+          const phone = document.getElementById('regPhone')?.value.trim() || '未填写';
+          openModal({ title: '注册成功', desc: '账号已创建', body: `<div class="result-box">欢迎您，${phone}<br>请前往登录页面登录。</div>`, buttonText: '关闭', onConfirm: closeModal });
+        }
+      });
+    };
+    document.getElementById('btnLogin').onclick = () => {
+      openModal({
+        title: '登录账号',
+        desc: '输入账号密码（演示态）',
+        body: `<div class="formgrid"><div class="field"><label>手机号/邮箱</label><input id="loginAccount" placeholder="请输入手机号或邮箱" /></div><div class="field"><label>密码</label><input id="loginPwd" type="password" placeholder="请输入密码" /></div><div class="field full"><div class="result-box">演示登录，点击确认后模拟登录成功。</div></div></div>`,
+        buttonText: '确认登录',
+        onConfirm: () => {
+          const account = document.getElementById('loginAccount')?.value.trim() || '未知账号';
+          openModal({ title: '登录成功', desc: '欢迎回来', body: `<div class="result-box">${account}，您已成功登录。<br>当前为演示模式，实际功能未接入后端。</div>`, buttonText: '关闭', onConfirm: closeModal });
+        }
+      });
+    };
+    document.getElementById('btnSwitch').onclick = () => {
+      const demoPresets = [
+        { name: '篮球爱好者', avatar: '🏀', phone: '139****1234' },
+        { name: '瑜伽行者', avatar: '🧘', phone: '136****5678' }
+      ];
+      const switchAccounts = [
+        {
+          name: userProfile.nickname || '运动达人',
+          avatar: userProfile.avatar || '👤',
+          phone: userProfile.phone || '未填手机',
+          email: userProfile.email || '',
+          source: 'profile'
+        },
+        ...demoPresets.map(p => ({ ...p, email: '', source: 'demo' }))
+      ];
+      const accountListHtml = switchAccounts.map((acc, idx) => {
+        const metaPhone = escapeHtml(acc.phone);
+        const metaExtra = acc.source === 'profile' && acc.email ? ` · ${escapeHtml(acc.email)}` : '';
+        const badge = acc.source === 'profile' ? '当前资料' : '切换';
+        return `<div class="item" data-switch-idx="${idx}" style="cursor:pointer; margin-bottom:8px;"><div class="left"><p class="name">${escapeHtml(acc.name)} ${escapeHtml(acc.avatar)}</p><p class="meta">${metaPhone}${metaExtra}</p></div><div class="badge">${badge}</div></div>`;
+      }).join('');
+      openModal({
+        title: '切换账号',
+        desc: '首条与「个人资料」编辑内容实时一致；点击下方演示账号可一键切换。',
+        body: `<div style="max-height:50vh; overflow-y:auto;">${accountListHtml}</div><div class="result-box" style="margin-top:12px;">编辑资料后再次打开本列表即可看到最新昵称、头像与手机。</div>`,
+        buttonText: '关闭',
+        onConfirm: closeModal
+      });
+      setTimeout(() => {
+        document.querySelectorAll('[data-switch-idx]').forEach(el => {
+          el.addEventListener('click', () => {
+            const idx = Number(el.getAttribute('data-switch-idx'));
+            const account = switchAccounts[idx];
+            if (!account) return;
+            if (account.source === 'profile') {
+              closeModal();
+              return;
+            }
+            userProfile.nickname = account.name;
+            userProfile.avatar = account.avatar;
+            userProfile.phone = account.phone;
+            saveProfileToStorage();
+            updateProfileUI();
+            closeModal();
+            openModal({
+              title: '切换成功',
+              desc: `已切换至 ${escapeHtml(account.name)}`,
+              body: `<div class="result-box">当前账号：${escapeHtml(account.name)} ${escapeHtml(account.avatar)}<br>手机：${escapeHtml(account.phone)}</div>`,
+              buttonText: '完成',
+              onConfirm: closeModal
+            });
+          });
+        });
+      }, 30);
+    };
+    document.getElementById('btnLogout').onclick = () => {
+      openModal({ title: '注销账号', desc: '确认注销当前账号？', body: `<div class="result-box">注销后所有数据将清空（演示态）<br>当前账号：${escapeHtml(userProfile.nickname)} ${userProfile.avatar}</div>`, buttonText: '确认注销', onConfirm: () => {
+        userProfile = { nickname: '运动达人', avatar: '👤', phone: '138****8888', email: 'user@dongda.com', addresses: [] };
+        saveProfileToStorage();
+        updateProfileUI();
+        renderAddressList();
+        closeModal();
+        openModal({ title: '注销成功', desc: '账号已注销', body: '<div class="result-box">您的账号已注销，如有疑问请联系客服。</div>', buttonText: '关闭', onConfirm: closeModal });
+      } });
+    };
+  }
+
+  function fmtMoney(n){ return `¥${Number(n||0).toFixed(2)}`; }
+
+  // 页面切换与搜索入口改造
+  const pages = { home:document.getElementById('page-home'), booking:document.getElementById('page-booking'), groups:document.getElementById('page-groups'), online:document.getElementById('page-online'), profile:document.getElementById('page-profile'), coach:document.getElementById('page-coach'), admin:document.getElementById('page-admin'), search:document.getElementById('page-search') };
+  const navBtns = document.querySelectorAll('.nav-btn');
+  let lastPage = 'home';
+  function switchPage(name){ if(pages[name]){ if(name !== 'admin') closeAdminOperatePanel(); Object.values(pages).forEach(p=>p.classList.remove('active')); pages[name].classList.add('active'); navBtns.forEach(btn=>btn.classList.toggle('active',btn.dataset.page===name)); const topbar = document.querySelector('.topbar'); if(name === 'profile' || name === 'search') topbar.classList.add('hide-search'); else topbar.classList.remove('hide-search'); if(name !== 'search') lastPage = name; window.scrollTo({top:0,behavior:'smooth'}); if(name === 'online') setTimeout(()=>{ if(typeof renderMyOnlineClasses==='function') renderMyOnlineClasses(); },0); if(name === 'coach') setTimeout(()=>{ if(typeof renderCoachAdminPanels==='function') renderCoachAdminPanels(); },0); } }
+  navBtns.forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
+  document.querySelectorAll('[data-switch]').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.switch)));
+
+  const allDayTabs = document.querySelectorAll('.day-tab');
+  let selectedBookingDay = document.querySelector('.day-tab.active')?.dataset.day || '周一';
+  let selectedBookingTime = document.querySelector('#timeSlots .slot.active:not(.off)')?.textContent?.trim() || '10:00';
+  function formatDateTimeByDayAndStart(dayLabel, startTime){
+    const now = new Date();
+    const date = new Date(now);
+    if (dayLabel === '今天' || !dayLabel) { /* 当天 */ }
+    else {
+      const dayMap = { '周日':0, '周一':1, '周二':2, '周三':3, '周四':4, '周五':5, '周六':6 };
+      const targetDay = dayMap[dayLabel];
+      if (typeof targetDay === 'number') {
+        const delta = (targetDay - now.getDay() + 7) % 7;
+        date.setDate(now.getDate() + delta);
+      }
+    }
+    const [hh, mm] = String(startTime || '16:00').split(':').map(v => Number(v));
+    date.setHours(isNaN(hh) ? 16 : hh, isNaN(mm) ? 0 : mm, 0, 0);
+    const yyyy = date.getFullYear();
+    const MM = String(date.getMonth() + 1).padStart(2,'0');
+    const dd = String(date.getDate()).padStart(2,'0');
+    const timeStr = String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0');
+    return `${yyyy}-${MM}-${dd} ${timeStr}`;
+  }
+  function activateDayTab(selectedTab){
+    allDayTabs.forEach(t=>t.classList.remove('active'));
+    selectedTab.classList.add('active');
+    selectedBookingDay = selectedTab.dataset.day || selectedBookingDay;
+  }
+  allDayTabs.forEach(t=>t.addEventListener('click',()=>activateDayTab(t)));
+  const defaultMonday = document.querySelector('.day-tab[data-day="周一"]');
+  if (defaultMonday) activateDayTab(defaultMonday);
+  document.querySelectorAll('#timeSlots .slot:not(.off)').forEach(slot=>{
+    slot.addEventListener('click',()=>{
+      document.querySelectorAll('#timeSlots .slot').forEach(s=>s.classList.remove('active'));
+      slot.classList.add('active');
+      selectedBookingTime = slot.textContent.trim();
+    });
+  });
+
+  const globalSearchInput = document.getElementById('globalSearch');
+  const globalSearchBtn = document.getElementById('searchBtn');
+  function openSearchPageWithKeyword(kw=''){ switchPage('search'); setTimeout(()=>{ const searchInput = document.getElementById('searchPageInput'); if(searchInput){ searchInput.value = kw; searchInput.dispatchEvent(new Event('input')); } }, 50); }
+  if(globalSearchInput) globalSearchInput.addEventListener('click',()=>openSearchPageWithKeyword(globalSearchInput.value));
+  if(globalSearchBtn){ const newBtn = globalSearchBtn.cloneNode(true); globalSearchBtn.parentNode.replaceChild(newBtn, globalSearchBtn); newBtn.addEventListener('click',()=>openSearchPageWithKeyword(globalSearchInput?.value||'')); }
+
+  // 搜索页逻辑
+  function initSearchPage(){
+    const searchInput = document.getElementById('searchPageInput');
+    const resultList = document.getElementById('searchPageResultList');
+    const countSpan = document.getElementById('searchPageCount');
+    const stateSpan = document.getElementById('searchPageState');
+    const filterContainer = document.getElementById('searchPageFilters');
+    let currentFilter = '全部';
+    let currentKeyword = '';
+    function render(){
+      let dataSource = searchIndex;
+      let filtered = dataSource.filter(item => {
+        const filterMatch = currentFilter === '全部' ? true :
+          (currentFilter === '教练' && item.type === '教练') ||
+          (currentFilter === '项目' && item.type === '项目') ||
+          (currentFilter === '拼团' && item.type === '拼团') ||
+          (currentFilter === '线上' && (item.type === '线上' || item.mode?.includes('线上') || item.category?.includes('线上'))) ||
+          (currentFilter === '体考' && (item.keyword?.includes('体考') || item.category?.includes('体考')));
+        const keywordMatch = !currentKeyword || (item.keyword?.toLowerCase().includes(currentKeyword) || item.title?.toLowerCase().includes(currentKeyword));
+        return filterMatch && keywordMatch;
+      });
+      countSpan.innerText = `共 ${filtered.length} 条结果`;
+      stateSpan.innerText = currentKeyword ? `关键词：${currentKeyword}` : '实时匹配';
+      if(filtered.length===0){ resultList.innerHTML = '<div class="search-empty">没有找到相关运动服务，试试其他关键词~</div>'; return; }
+      resultList.innerHTML = filtered.map(item => {
+        const priceText = item.price ? (typeof item.price === 'number' ? `¥${item.price.toFixed(2)}` : item.price) : '¥0';
+        const descText = item.desc || item.detail || item.subtitle || '';
+        return `<div class="item" data-item-id="${item.id}" data-item-type="${item.type}"><div class="left"><p class="name">${escapeHtml(item.title || item.name)}</p><p class="meta">${escapeHtml(descText.substring(0,60))}</p><div class="meta-line"><span class="search-pill">${escapeHtml(item.type)}</span>${item.category?`<span class="search-pill">${escapeHtml(item.category)}</span>`:''}</div></div><div style="display:flex; gap:8px; align-items:center;"><button class="inline-btn detail-btn" data-id="${item.id}" data-type="${item.type}">详情</button><button class="price-pay-btn pay-btn" data-id="${item.id}" data-type="${item.type}" data-price="${item.price}">${priceText} 支付</button></div></div>`;
+      }).join('');
+      document.querySelectorAll('#searchPageResultList .detail-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); const id = btn.getAttribute('data-id'); const type = btn.getAttribute('data-type'); const fullItem = filtered.find(i=>i.id==id && i.type===type); if(fullItem) openSearchItemDetail(fullItem); }));
+      document.querySelectorAll('#searchPageResultList .pay-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); const id = btn.getAttribute('data-id'); const type = btn.getAttribute('data-type'); const fullItem = filtered.find(i=>i.id==id && i.type===type); if(fullItem) payForSearchItem(fullItem); }));
+    }
+    function resolveGroupItem(item){
+      return [...createdGroups,...customGroups,...groups].find(g=>g.id===item.id) || groups.find(g=>g.id===item.id) || item;
+    }
+    function openSearchItemDetail(item){
+      if(item.type === '拼团'){
+        const group = resolveGroupItem(item);
+        openModal({title:'拼团详情',desc:group.title,body:`<div class="result-box">${escapeHtml(group.detail)}<br>${escapeHtml(group.people)}<br>价格：${escapeHtml(group.price)}</div>`,buttonText:'去参团',onConfirm:()=>{ openSafetyAgreement(()=>{ const orderId = createPaidOrder({type:'拼团订单',coachName:'拼团教练',courseName:group.title,time:new Date().toLocaleString(),price:Number(String(group.price).replace(/[^\d.]/g,''))||99,detail:group.detail}); openPaymentSuccess(orderId); }); }});
+      } else if (item.type === '教练') {
+        const coach = coaches.find(c=>c.id===item.id);
+        if (coach) openInstantBookingModal(coach.id);
+      } else if (item.type === '项目') {
+        const project = projects.find(p=>p.id===item.id);
+        if (!project) return;
+        const coach = coaches.find(c => c.category === project.category) || coaches[0];
+        openInstantBookingModal(coach.id, project.id);
+      } else {
+        const priceNum = typeof item.price === 'number' ? item.price : (parseFloat(String(item.price).replace(/[^\d.]/g,'')) || 99);
+        openModal({title:'服务详情',desc:item.title,body:`<div class="result-box">${escapeHtml(item.desc||'')}<br>价格：¥${priceNum.toFixed(2)}</div>`,buttonText:'立即预约',onConfirm:()=>{ openSafetyAgreement(()=>{ const orderId = createPaidOrder({type:item.type==='线上'?'线上课程':'预约订单',coachName:item.type==='教练'?item.title:'动达教练',courseName:item.title,time:new Date().toLocaleString(),price:priceNum,detail:item.desc||''}); openPaymentSuccess(orderId); }); }});
+      }
+    }
+    function payForSearchItem(item){
+      if(item.type === '拼团'){
+        const group = resolveGroupItem(item);
+        openSafetyAgreement(()=>{ const orderId = createPaidOrder({type:'拼团订单',coachName:'拼团教练',courseName:group.title,time:new Date().toLocaleString(),price:Number(String(group.price).replace(/[^\d.]/g,''))||99,detail:group.detail}); openPaymentSuccess(orderId); });
+      } else if (item.type === '教练') {
+        const coach = coaches.find(c=>c.id===item.id);
+        if (coach) openInstantBookingModal(coach.id);
+      } else if (item.type === '项目') {
+        const project = projects.find(p=>p.id===item.id);
+        if (!project) return;
+        const coach = coaches.find(c => c.category === project.category) || coaches[0];
+        openInstantBookingModal(coach.id, project.id);
+      } else {
+        const priceNum = typeof item.price === 'number' ? item.price : (parseFloat(String(item.price).replace(/[^\d.]/g,'')) || 99);
+        openSafetyAgreement(()=>{ const orderId = createPaidOrder({type:item.type==='线上'?'线上课程':'预约订单',coachName:item.type==='教练'?item.title:'动达教练',courseName:item.title,time:new Date().toLocaleString(),price:priceNum,detail:item.desc||''}); openPaymentSuccess(orderId); });
+      }
+    }
+    function bindFilters(){ const tabs = filterContainer.querySelectorAll('.tab'); tabs.forEach(tab=>{ tab.addEventListener('click',()=>{ tabs.forEach(t=>t.classList.remove('active')); tab.classList.add('active'); currentFilter = tab.getAttribute('data-filter'); render(); }); }); }
+    function bindSearchInput(){ if(searchInput) searchInput.addEventListener('input',(e)=>{ currentKeyword = e.target.value.trim().toLowerCase(); render(); }); }
+    function bindSuggestions(){ document.querySelectorAll('#searchPageSuggests .search-chip').forEach(s=>{ s.addEventListener('click',()=>{ const key = s.getAttribute('data-key'); if(searchInput) searchInput.value = key; currentKeyword = key.toLowerCase(); render(); }); }); }
+    document.getElementById('searchPageBackBtn').addEventListener('click',()=>switchPage(lastPage));
+    bindFilters(); bindSearchInput(); bindSuggestions(); render();
+  }
+
+  function calcGroupDiscount(price,people){let d=1;if(people>=20)d=0.7;else if(people>=10)d=0.8;else if(people>=5)d=0.9;return {discount:d,finalPrice:price*d,total:price*d*people,saved:price*(1-d)*people};}
+  function openDiscountModal(){openModal({title:'拼团折扣测算器',desc:'输入原价和人数，自动匹配阶梯式拼团折扣方案。',body:`<div class="formgrid"><div class="field"><label>单课原价（元）</label><input id="groupPrice" type="number" value="99" min="1" /></div><div class="field"><label>参团人数</label><input id="groupPeople" type="number" value="5" min="1" /></div><div class="field full"><label>结果输出</label><div class="result-box" id="groupResult">点击下方按钮开始计算。</div></div></div>`,buttonText:'立即计算',onConfirm:()=>{let p=Number(document.getElementById('groupPrice').value),n=Number(document.getElementById('groupPeople').value);if(p<=0||n<=0){document.getElementById('groupResult').innerHTML='请输入正确的课程原价与参团人数。';return;}let r=calcGroupDiscount(p,n);document.getElementById('groupResult').innerHTML=`当前折扣：<b>${Math.round(r.discount*10)} 折</b><br>拼团单价：<b>¥${r.finalPrice.toFixed(2)}</b><br>预计成交额：<b>¥${r.total.toFixed(2)}</b><br>用户总节省：<b>¥${r.saved.toFixed(2)}</b>`;}});}
+  function openBookingPaymentModal({ coach, project, timeStr, price, duration, address }) {
+    openModal({
+      title: '确认支付',
+      desc: '支付「' + escapeHtml(coach.name) + '」的预约订单',
+      body: `
+        <div class="formgrid">
+          <div class="field full">
+            <label>订单信息</label>
+            <div class="result-box">
+              项目：${escapeHtml(project?.name || coach.category)}<br>
+              教练：${escapeHtml(coach.name)}<br>
+              时段：${escapeHtml(timeStr)}<br>
+              金额：¥${money(price)}<br>
+              备注：${escapeHtml(address || '') || '-'}
+            </div>
+          </div>
+          <div class="field">
+            <label>支付方式</label>
+            <select id="bookingPayMethod">
+              <option value="微信支付">微信支付</option>
+              <option value="支付宝支付">支付宝支付</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>应付金额</label>
+            <input value="¥${money(price)}" readonly style="background:#f5f7fb;" />
+          </div>
+        </div>
+      `,
+      buttonText: `确认支付 ¥${money(price)}`,
+      onConfirm: () => {
+        const payMethod = document.getElementById('bookingPayMethod')?.value || '微信支付';
+        openSafetyAgreement(() => {
+          const orderId = createPaidOrder({
+            type: '线下课',
+            coachName: coach.name,
+            courseName: project?.name || coach.category,
+            time: timeStr,
+            price: price,
+            detail: `${duration}小时 · 支付方式：${payMethod} · 备注：${address || ''}`.trim()
+          });
+          closeModal();
+          openPaymentSuccess(orderId, '预约成功');
+        });
+      }
+    });
+  }
+  function openInstantBookingModal(presetCoachId = null, presetProjectId = null) {
+    const timeSlots = [
+      { start:'08:00', label:'08:00-10:00（2小时）', duration:2, off:false },
+      { start:'10:00', label:'10:00-11:00（1小时）', duration:1, off:false },
+      { start:'14:00', label:'14:00-16:00（2小时）', duration:2, off:false },
+      { start:'16:00', label:'16:00-17:00（1小时）', duration:1, off:false },
+      { start:'18:00', label:'18:00-20:00（2小时）', duration:2, off:true },
+      { start:'20:00', label:'20:00-21:00（1小时）', duration:1, off:false }
+    ];
+    const initialStart = timeSlots.find(s => s.start === selectedBookingTime && !s.off)?.start || '16:00';
+    const dayLabel = selectedBookingDay || '周一';
+    const coachOptionsHtml = coaches.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    const initialCoach = coaches.find(c => c.id === presetCoachId) || coaches[0];
+    const allProjectOptionsHtml = projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    openModal({
+      title: '立即约',
+      desc: '选择教练与预约时段，确认支付生成订单',
+      body: `
+        <div class="formgrid">
+          <div class="field">
+            <label>选择教练</label>
+            <select id="bookCoachPick">${coachOptionsHtml}</select>
+          </div>
+          <div class="field">
+            <label>选择项目</label>
+            <select id="bookProjectPick">${allProjectOptionsHtml}</select>
+          </div>
+          <div class="field full">
+            <label>预约时段</label>
+            <div class="schedule-grid" id="bookTimeSlots">
+              ${timeSlots.map(s => `<div class="slot ${s.off?'off':''} ${s.start===initialStart?'active':''}" data-start="${s.start}" data-duration="${s.duration}">${s.start} · ${s.duration}小时</div>`).join('')}
+            </div>
+          </div>
+          <div class="field full">
+            <label>预约时间</label>
+            <input id="bookDateTime" readonly value="${formatDateTimeByDayAndStart(dayLabel, initialStart)}" />
+          </div>
+          <div class="field full">
+            <label>地点 / 备注</label>
+            <textarea id="bookAddress">学校操场东门集合，器材由平台提供。</textarea>
+          </div>
+        </div>
+      `,
+      buttonText: '确认并支付',
+      onConfirm: () => {
+        const coachId = document.getElementById('bookCoachPick')?.value || initialCoach.id;
+        const coach = coaches.find(c => c.id === coachId);
+        const projectId = document.getElementById('bookProjectPick')?.value;
+        const project = projects.find(p => p.id === projectId) || projects[0];
+        const slotEl = document.getElementById('bookTimeSlots')?.querySelector('.slot.active');
+        const start = slotEl?.dataset.start || initialStart;
+        const duration = Number(slotEl?.dataset.duration || 2);
+        const timeStr = formatDateTimeByDayAndStart(dayLabel, start);
+        const address = document.getElementById('bookAddress')?.value || '';
+        openBookingPaymentModal({ coach, project, timeStr, price: coach.price, duration, address });
+      }
+    });
+    setTimeout(() => {
+      const bookCoachPick = document.getElementById('bookCoachPick');
+      const bookProjectPick = document.getElementById('bookProjectPick');
+      const slotWrap = document.getElementById('bookTimeSlots');
+      const bookDateTime = document.getElementById('bookDateTime');
+      if (!bookCoachPick || !bookProjectPick || !slotWrap || !bookDateTime) return;
+      bookCoachPick.value = initialCoach.id;
+      function updateDateTimeByActive(){
+        const s = slotWrap.querySelector('.slot.active');
+        const nextStart = s?.dataset.start || initialStart;
+        bookDateTime.value = formatDateTimeByDayAndStart(dayLabel, nextStart);
+      }
+      slotWrap.querySelectorAll('.slot:not(.off)').forEach(s => {
+        s.addEventListener('click', () => {
+          slotWrap.querySelectorAll('.slot').forEach(x => x.classList.remove('active'));
+          s.classList.add('active');
+          updateDateTimeByActive();
+        });
+      });
+      function updateProjectByCoach(){
+        const coach = coaches.find(c => c.id === bookCoachPick.value);
+        const matched = projects.filter(p => p.category === coach.category);
+        const list = matched.length ? matched : projects;
+        bookProjectPick.innerHTML = list.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+        if (presetProjectId && bookProjectPick.querySelector(`option[value="${presetProjectId}"]`)) bookProjectPick.value = presetProjectId;
+      }
+      bookCoachPick.addEventListener('change', updateProjectByCoach);
+      updateProjectByCoach();
+      updateDateTimeByActive();
+    }, 0);
+  }
+  function openGenericBooking(){ openInstantBookingModal(); }
+  function openGroupPublishModal(){
+    const timeSlots = [
+      { start:'08:00', label:'08:00-10:00（2小时）', duration:2, off:false },
+      { start:'10:00', label:'10:00-11:00（1小时）', duration:1, off:false },
+      { start:'14:00', label:'14:00-16:00（2小时）', duration:2, off:false },
+      { start:'16:00', label:'16:00-17:00（1小时）', duration:1, off:false },
+      { start:'18:00', label:'18:00-20:00（2小时）', duration:2, off:true },
+      { start:'20:00', label:'20:00-21:00（1小时）', duration:1, off:false }
+    ];
+    const defaultSlot = timeSlots.find(s=>!s.off) || timeSlots[0];
+    const projectsOptions = projects.map(p => `<option value="${p.id}" data-category="${p.category}">${escapeHtml(p.name)}（${escapeHtml(p.category)}）</option>`).join('');
+    const venuesOptions = venues.map(v => `<option value="${v.id}">${escapeHtml(v.name)}</option>`).join('');
+    const coachesOptions = coaches.map(c => `<option value="${c.id}" data-category="${c.category}">${escapeHtml(c.name)}</option>`).join('');
+    openModal({
+      title:'开团发布',
+      desc:'选择时段、项目、教练与地点，系统会给出对应价格与折扣测算。',
+      body:`
+        <div class="formgrid">
+          <div class="field full">
+            <label>时间段</label>
+            <div class="schedule-grid" id="grpTimeSlots">
+              ${timeSlots.map(s => `<div class="slot ${s.start===defaultSlot.start?'active':''} ${s.off?'off':''}" data-start="${s.start}" data-duration="${s.duration}">${escapeHtml(s.label)}</div>`).join('')}
+            </div>
+          </div>
+          <div class="field"><label>项目</label><select id="grpProject">${projectsOptions}</select></div>
+          <div class="field"><label>教练</label><select id="grpCoach">${coachesOptions}</select></div>
+          <div class="field"><label>地点</label><select id="grpVenue">${venuesOptions}</select></div>
+          <div class="field"><label>参团人数（用于折扣）</label><input id="grpPeople" type="number" value="5" min="1" /></div>
+          <div class="field full"><label>对应价格</label><div class="result-box" id="grpPriceResult">等待你选择完成。</div></div>
+        </div>
+      `,
+      buttonText:'发布开团并去预约',
+      onConfirm: () => {
+        const slotEl = document.getElementById('grpTimeSlots')?.querySelector('.slot.active');
+        const start = slotEl?.dataset.start || defaultSlot.start;
+        const duration = Number(slotEl?.dataset.duration || defaultSlot.duration);
+        const projectId = document.getElementById('grpProject')?.value || projects[0].id;
+        const coachId = document.getElementById('grpCoach')?.value || coaches[0].id;
+        const venueId = document.getElementById('grpVenue')?.value || venues[0].id;
+        const people = Number(document.getElementById('grpPeople')?.value || 5);
+        const project = projects.find(p => p.id === projectId);
+        const coach = coaches.find(c => c.id === coachId);
+        const venue = venues.find(v => v.id === venueId);
+        if (!project || !coach || !venue) return;
+        const dayLabel = (document.getElementById('page-booking')?.classList.contains('active') ? selectedBookingDay : '今天') || '今天';
+        const venueFee = duration === 2 ? venue.price2h : venue.price1h;
+        const basePerPerson = coach.price + venueFee;
+        const r = calcGroupDiscount(basePerPerson, people);
+        const finalPerPerson = r.finalPrice;
+        const newGroup = {
+          id: 'CG' + Date.now(),
+          type: '拼团',
+          title: `${project.name} · ${people}人团`,
+          detail: `${dayLabel} ${start} · 教练：${coach.name}`,
+          tag: '我开团',
+          people: `已${people}/${people}人`,
+          price: `¥${money(finalPerPerson)}/人`
+        };
+        createdGroups.unshift(newGroup);
+        saveCreatedGroupsToStorage();
+        renderDynamicGroups();
+        groupDraft = { start, duration, day: dayLabel, projectName: project.name, coachName: coach.name, venueId, people };
+        closeModal();
+        openVenueBookingModal({ venueId, duration, day: dayLabel, start, coachName: coach.name, projectName: project.name, people });
+      }
+    });
+    setTimeout(() => {
+      const grpProjectEl = document.getElementById('grpProject');
+      const grpCoachEl = document.getElementById('grpCoach');
+      const grpVenueEl = document.getElementById('grpVenue');
+      const grpPeopleEl = document.getElementById('grpPeople');
+      const grpPriceResult = document.getElementById('grpPriceResult');
+      const slotWrap = document.getElementById('grpTimeSlots');
+      if (!slotWrap || !grpProjectEl || !grpCoachEl || !grpVenueEl || !grpPeopleEl || !grpPriceResult) return;
+      function getActiveSlot(){
+        const s = slotWrap.querySelector('.slot.active');
+        if (!s) return defaultSlot;
+        return { start: s.dataset.start, duration: Number(s.dataset.duration || defaultSlot.duration) };
+      }
+      function updateCoachOptionsByProject(){
+        const project = projects.find(p => p.id === grpProjectEl.value);
+        if (!project) return;
+        const matched = coaches.filter(c => c.category === project.category);
+        const next = matched.length ? matched : coaches;
+        const html = next.map(c => `<option value="${c.id}" data-category="${escapeHtml(c.category)}">${escapeHtml(c.name)}</option>`).join('');
+        const curCoachId = grpCoachEl.value;
+        grpCoachEl.innerHTML = html;
+        if (curCoachId && next.some(c => c.id === curCoachId)) grpCoachEl.value = curCoachId;
+      }
+      function renderPrice(){
+        const { duration } = getActiveSlot();
+        const project = projects.find(p => p.id === grpProjectEl.value);
+        const coach = coaches.find(c => c.id === grpCoachEl.value);
+        const venue = venues.find(v => v.id === grpVenueEl.value);
+        const people = Number(grpPeopleEl.value || 5);
+        if (!project || !coach || !venue) return;
+        const venueFee = duration === 2 ? venue.price2h : venue.price1h;
+        const basePerPerson = coach.price + venueFee;
+        const r = calcGroupDiscount(basePerPerson, people);
+        grpPriceResult.innerHTML = `原价单价：<b>¥${money(basePerPerson)}</b><br>预计折扣：<b>${Math.round((r.discount || 1)*10)} 折</b><br>折后单价：<b style="color:var(--brand)">¥${money(r.finalPrice)}</b><br>预计成交额：<b>¥${money(r.total)}</b><br>用户节省：<b>¥${money(r.saved)}</b>`;
+      }
+      slotWrap.querySelectorAll('.slot:not(.off)').forEach(s => {
+        s.addEventListener('click', () => {
+          slotWrap.querySelectorAll('.slot').forEach(x => x.classList.remove('active'));
+          s.classList.add('active');
+          renderPrice();
+        });
+      });
+      grpProjectEl.addEventListener('change', () => { updateCoachOptionsByProject(); renderPrice(); });
+      grpCoachEl.addEventListener('change', renderPrice);
+      grpVenueEl.addEventListener('change', renderPrice);
+      grpPeopleEl.addEventListener('input', renderPrice);
+      updateCoachOptionsByProject();
+      renderPrice();
+    }, 0);
+  }
+  function openVenueBookingModal(preset = null) {
+    const dayLabel = preset?.day || (document.getElementById('page-booking')?.classList.contains('active') ? selectedBookingDay : '今天') || '今天';
+    const initialStart = preset?.start || selectedBookingTime || '16:00';
+    const initialDuration = Number(preset?.duration ?? 2);
+    const venueIdDefault = preset?.venueId || venues[0].id;
+    const timeSlots = [
+      { start:'08:00', duration:2, off:false },
+      { start:'10:00', duration:1, off:false },
+      { start:'14:00', duration:2, off:false },
+      { start:'16:00', duration:1, off:false },
+      { start:'18:00', duration:2, off:true },
+      { start:'20:00', duration:1, off:false }
+    ];
+    openModal({
+      title: '场地预约',
+      desc: '选择场地与时长并支付（演示态）',
+      body: `
+        <div class="formgrid">
+          <div class="field"><label>场地类型</label>
+            <select id="venuePick">${venues.map(v => `<option value="${v.id}">${escapeHtml(v.name)}（${escapeHtml(v.desc)}）</option>`).join('')}</select>
+          </div>
+          <div class="field full">
+            <label>预约时段</label>
+            <div class="schedule-grid" id="venueTimeSlots">
+              ${timeSlots.map(s => `<div class="slot ${s.off?'off':''} ${s.start===initialStart?'active':''}" data-start="${s.start}" data-duration="${s.duration}">${s.start} · ${s.duration}小时</div>`).join('')}
+            </div>
+          </div>
+          <div class="field full"><label>预约时间</label><input id="venueTime" readonly value="${formatDateTimeByDayAndStart(dayLabel, initialStart)}" /></div>
+          <div class="field full"><label>备注</label><textarea id="venueNote">按约定时间使用，器材由平台提供。</textarea></div>
+          <div class="field full"><label>支付金额</label><div class="result-box" id="venuePayHint">点击「确认并支付」生成订单。</div></div>
+        </div>
+      `,
+      buttonText: '确认并支付',
+      onConfirm: () => {
+        const venueId = document.getElementById('venuePick')?.value;
+        const slotEl = document.getElementById('venueTimeSlots')?.querySelector('.slot.active');
+        const duration = Number(slotEl?.dataset.duration || initialDuration);
+        const time = document.getElementById('venueTime')?.value || formatDateTimeByDayAndStart(dayLabel, slotEl?.dataset.start || initialStart);
+        const note = document.getElementById('venueNote')?.value || '';
+        const venue = venues.find(v => v.id === venueId);
+        if (!venue) return;
+        const price = duration === 2 ? venue.price2h : venue.price1h;
+        createPaidOrder({
+          type: '场地预约',
+          coachName: '动达平台',
+          courseName: `场地预约｜${venue.name} · ${duration}小时`,
+          time,
+          price,
+          detail: note
+        });
+        openModal({
+          title: '支付成功',
+          desc: '场地预约已创建（演示态）',
+          body: `<div class="result-box"><b>已支付</b><br>订单内容：场地预约｜${escapeHtml(venue.name)} · ${duration}小时<br>金额：¥${money(price)}<br>时间：${escapeHtml(time)}</div>`,
+          buttonText: '完成',
+          onConfirm: () => { closeModal(); switchPage('profile'); setTimeout(() => showOrdersModal(), 80); }
+        });
+      }
+    });
+    setTimeout(() => {
+      const venuePickEl = document.getElementById('venuePick');
+      const venueTimeEl = document.getElementById('venueTime');
+      const venueNoteEl = document.getElementById('venueNote');
+      const venuePayHintEl = document.getElementById('venuePayHint');
+      const slotWrap = document.getElementById('venueTimeSlots');
+      if (!venuePickEl || !venueTimeEl || !venuePayHintEl || !slotWrap) return;
+      venuePickEl.value = venueIdDefault;
+      venueTimeEl.value = formatDateTimeByDayAndStart(dayLabel, initialStart);
+      if (preset?.coachName || preset?.projectName) {
+        const base = venueNoteEl.value || '按约定时间使用，器材由平台提供。';
+        venueNoteEl.value = `来自开团需求：教练${preset.coachName || '-'}；项目${preset.projectName || '-'}。\n${base}`.trim();
+      }
+      function getActiveSlot(){
+        const s = slotWrap.querySelector('.slot.active');
+        if (!s) return { start: initialStart, duration: initialDuration };
+        return { start: s.dataset.start, duration: Number(s.dataset.duration || initialDuration) };
+      }
+      function recalcHint(){
+        const venue = venues.find(v => v.id === venuePickEl.value);
+        const { duration } = getActiveSlot();
+        if (!venue) return;
+        const price = duration === 2 ? venue.price2h : venue.price1h;
+        venuePayHintEl.innerHTML = `参考价格：<b>¥${money(price)}</b>（已按时段与时长估算）`;
+      }
+      slotWrap.querySelectorAll('.slot:not(.off)').forEach(s => {
+        s.addEventListener('click', () => {
+          slotWrap.querySelectorAll('.slot').forEach(x => x.classList.remove('active'));
+          s.classList.add('active');
+          venueTimeEl.value = formatDateTimeByDayAndStart(dayLabel, s.dataset.start);
+          recalcHint();
+        });
+      });
+      venuePickEl.addEventListener('change', recalcHint);
+      recalcHint();
+    }, 0);
+  }
+  function openEquipmentRentalModal() {
+    openModal({
+      title: '器材租赁',
+      desc: '选择器材并支付（演示态）',
+      body: `
+        <div class="formgrid">
+          <div class="field"><label>租赁项目</label>
+            <select id="rentalPick">${rentalProducts.map(p => `<option value="${p.id}">${escapeHtml(p.name)}（¥${p.price}）</option>`).join('')}</select>
+          </div>
+          <div class="field"><label>数量</label><input id="rentalQty" type="number" value="1" min="1" /></div>
+          <div class="field full"><label>预约时间</label><input id="rentalTime" value="今天 17:00" /></div>
+          <div class="field full"><label>备注</label><textarea id="rentalNote">需要现场对接/取用说明。</textarea></div>
+        </div>
+      `,
+      buttonText: '确认并支付',
+      onConfirm: () => {
+        const rentalId = document.getElementById('rentalPick')?.value;
+        const qty = Math.max(1, Number(document.getElementById('rentalQty')?.value || 1));
+        const time = document.getElementById('rentalTime')?.value || '今天 17:00';
+        const note = document.getElementById('rentalNote')?.value || '';
+        const product = rentalProducts.find(p => p.id === rentalId);
+        if (!product) return;
+        const price = product.price * qty;
+        createPaidOrder({ type: '器材租赁', coachName: '动达平台', courseName: `器材租赁｜${product.name} × ${qty}`, time, price, detail: note });
+        openModal({ title: '支付成功', desc: '器材租赁已创建（演示态）', body: `<div class="result-box"><b>已支付</b><br>订单内容：${escapeHtml(product.name)} × ${qty}<br>金额：¥${money(price)}<br>时间：${escapeHtml(time)}</div>`, buttonText: '完成', onConfirm: closeModal });
+      }
+    });
+  }
+  function renderSupplementCartUI() {
+    const cartListEl = document.getElementById('supp-cart-list');
+    const totalEl = document.getElementById('supp-cart-total');
+    if (!cartListEl || !totalEl) return;
+    const entries = Object.entries(supplementCart);
+    if (entries.length === 0) {
+      cartListEl.innerHTML = '<div class="search-empty">购物车为空，先添加商品吧。</div>';
+      totalEl.textContent = '¥0.00';
+      return;
+    }
+    let total = 0;
+    cartListEl.innerHTML = entries.map(([pid, qty]) => {
+      const product = supplementProducts.find(p => p.id === pid);
+      const line = (product ? product.price : 0) * qty;
+      total += line;
+      return `<div class="item"><div class="left"><p class="name">${escapeHtml(product ? product.name : pid)}</p><p class="meta">单价：¥${money(product ? product.price : 0)} · 数量：${qty}</p></div><div style="display:flex;gap:8px;align-items:center;"><button class="mini-btn" style="padding:6px 10px;" onclick="suppChangeQty('${pid}',-1)">-</button><button class="mini-btn" style="padding:6px 10px;" onclick="suppChangeQty('${pid}',1)">+</button></div></div>`;
+    }).join('');
+    totalEl.textContent = '¥' + money(total);
+  }
+  function renderSupplementProductsUI() {
+    const productsListEl = document.getElementById('supp-products-list');
+    if (!productsListEl) return;
+    productsListEl.innerHTML = supplementProducts.map(p => `<div class="item"><div class="left"><p class="name">${escapeHtml(p.name)}</p><p class="meta">${escapeHtml(p.desc)} · ¥${money(p.price)}</p></div><button class="mini-btn" style="padding:6px 12px;" onclick="suppAddToCart('${p.id}')">+ 加入</button></div>`).join('');
+  }
+  function openSupplementCartModal() {
+    openModal({
+      title: '运动补给 · 购物车',
+      desc: '添加商品后结算支付（演示态）',
+      body: `
+        <div class="section" style="margin-bottom:10px;">
+          <div class="card-title" style="margin-bottom:8px;"><span>可选商品</span><span class="tag">立即添加</span></div>
+          <div class="list" id="supp-products-list"></div>
+        </div>
+        <div class="section" style="margin-bottom:10px;">
+          <div class="card-title" style="margin-bottom:8px;"><span>购物车</span><span class="tag good">可调整数量</span></div>
+          <div class="list" id="supp-cart-list"></div>
+        </div>
+        <div class="section">
+          <div class="card-title" style="margin-bottom:8px;"><span>合计</span><span class="tag warn">支付完成即生成订单</span></div>
+          <div class="result-box" id="supp-cart-total">¥0.00</div>
+        </div>
+      `,
+      buttonText: '结算并支付',
+      onConfirm: () => {
+        const entries = Object.entries(supplementCart);
+        if (entries.length === 0) {
+          openModal({ title: '购物车为空', desc: '请先添加商品再结算', body: '<div class="result-box">暂无可支付的运动补给。</div>', buttonText: '知道了', onConfirm: closeModal });
+          return;
+        }
+        const itemsText = entries.map(([pid, qty]) => { const p = supplementProducts.find(x => x.id === pid); return `${p ? p.name : pid} × ${qty}`; }).join('<br>');
+        let total = 0;
+        entries.forEach(([pid, qty]) => { const p = supplementProducts.find(x => x.id === pid); total += (p ? p.price : 0) * qty; });
+        openModal({
+          title: '支付确认',
+          desc: '确认后创建补给订单（演示态）',
+          body: `<div class="result-box"><b>商品清单</b><br>${itemsText}<br><br><b>合计：</b>¥${money(total)}</div>`,
+          buttonText: '确认支付',
+          onConfirm: () => {
+            const timeText = new Date().toLocaleString();
+            createPaidOrder({
+              type: '运动补给',
+              coachName: '动达平台',
+              courseName: `运动补给｜${entries.map(([pid, qty]) => { const p = supplementProducts.find(x => x.id === pid); return `${p ? p.name : pid}×${qty}`; }).join('，')}`,
+              time: timeText,
+              price: total,
+              detail: '购物车结算（演示态）'
+            });
+            supplementCart = {};
+            openModal({ title: '支付成功', desc: '运动补给订单已创建（演示态）', body: `<div class="result-box"><b>已支付</b><br>合计：¥${money(total)}<br>时间：${escapeHtml(timeText)}</div>`, buttonText: '完成', onConfirm: closeModal });
+          }
+        });
+      }
+    });
+    setTimeout(() => { renderSupplementProductsUI(); renderSupplementCartUI(); }, 30);
+  }
+  function suppAddToCart(productId) { supplementCart[productId] = (supplementCart[productId] || 0) + 1; renderSupplementCartUI(); }
+  function suppChangeQty(productId, delta) {
+    const cur = supplementCart[productId] || 0;
+    const next = cur + delta;
+    if (next <= 0) delete supplementCart[productId];
+    else supplementCart[productId] = next;
+    renderSupplementCartUI();
+  }
+  document.getElementById('openBookingWizard')?.addEventListener('click', openGenericBooking);
+  const adStrip = document.getElementById('adStrip');
+  if (adStrip) { adStrip.addEventListener('click', (e) => { let target = e.target.closest('.ad-card'); if (!target) return; const title = target.querySelector('h3')?.textContent.trim() || ''; if (title.includes('新人首单') || title.includes('首单立减')) switchPage('booking'); else if (title.includes('体考冲刺')) switchPage('groups'); else if (title.includes('线上直播')) switchPage('online'); else if (title.includes('亲子运动')) switchPage('booking'); else if (title.includes('企业工间操')) switchPage('groups'); else switchPage('booking'); }); }
+  document.getElementById('openDiscount')?.addEventListener('click', openDiscountModal);
+  document.getElementById('openOrderModal')?.addEventListener('click', openGenericBooking);
+  document.getElementById('showTrackBtn')?.addEventListener('click',showOrdersModal);
+  document.getElementById('addAddressBtn')?.addEventListener('click', addAddress);
+  document.getElementById('myOrdersBtn')?.addEventListener('click',showOrdersModal);
+  document.getElementById('goToCoachBtn')?.addEventListener('click',()=>switchPage('coach'));
+  document.getElementById('goToAdminBtn')?.addEventListener('click',()=>switchPage('admin'));
+  document.getElementById('coachApplyBtn')?.addEventListener('click',()=>openModal({title:'教练入驻',desc:'提交资料',body:'<div class="formgrid"><div class="field"><label>姓名</label><input id="applyName" value="新教练"></div><div class="field"><label>项目</label><input id="applyCategory" value="篮球"></div><div class="field"><label>手机号</label><input id="applyPhone" value="13912345678"></div><div class="field full"><label>证书/简历</label><textarea id="applyCert">社会体育指导员 / 运动经历简述</textarea></div></div>',buttonText:'提交申请',onConfirm:()=>{coachAuditPool.unshift({id:'ap'+Date.now(),name:document.getElementById('applyName').value,category:document.getElementById('applyCategory').value,phone:document.getElementById('applyPhone').value,status:'待审核',cert:document.getElementById('applyCert').value,resume:document.getElementById('applyCert').value,slots:['2026-03-30 10:00','2026-03-30 16:00']}); persistExtra(); renderCoachAdminPanels(); openModal({title:'已提交',desc:'已进入审核池',body:'<div class="result-box">后台可审核通过或不通过，通过后即可接单。</div>',buttonText:'完成',onConfirm:closeModal});}}));
+  document.getElementById('coachTakeOrder')?.addEventListener('click',()=>switchPage('coach'));
+  document.getElementById('adminAction')?.addEventListener('click',()=>switchPage('admin'));
+  document.getElementById('financeAction')?.addEventListener('click',()=>openModal({title:'交易流水',desc:'交易记录',body:`<div style="max-height:56vh;overflow:auto">${transactions.map(t=>`<div class="order-item"><b>${escapeHtml(t.title)}</b><div class="small-note">${escapeHtml(t.kind)} · ${fmtMoney(t.amount)} · ${escapeHtml(t.time)} · ${escapeHtml(t.status)}</div></div>`).join('') || '<div class="result-box">暂无交易</div>'}</div>`,buttonText:'关闭',onConfirm:closeModal}));
+  document.getElementById('joinGroupBtn')?.addEventListener('click', openGroupPublishModal);
+  document.getElementById('openGroupCalc')?.addEventListener('click', openDiscountModal);
+  document.getElementById('onlineHeroBtn')?.addEventListener('click',()=>{ const list = document.getElementById('onlineCourseList'); if(list) list.scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('onlineHotBtn')?.addEventListener('click',()=>{ const hot = onlineCourses.filter(c=>c.hot).map(c=>c.name).join('、'); openModal({title:'🔥 热门推荐',desc:'热卖课程',body:`<div class="result-box">${hot}</div>`,buttonText:'知道了',onConfirm:closeModal}); });
+  document.getElementById('onlineCourseList').innerHTML = onlineCourses.map(course => `<div class="item"><div class="left"><p class="name">${course.name} ${course.hot ? '🔥' : ''}</p><p class="meta">${course.desc}</p><div class="meta-line"><span class="search-pill">${course.category}</span><span class="search-pill">${course.mode}</span></div><p class="meta">时长：${course.duration} · 教练：${course.teacher} · 消耗：${course.calories}千卡</p><div style="margin-top:10px;"><video src="${course.previewVideo}" controls preload="metadata" playsinline style="width:100%;border-radius:14px;max-height:120px;"></video></div></div><div class="badge" style="cursor:pointer;" data-course-id="${course.id}">支付 ¥${course.price}</div></div>`).join('');
+  document.querySelectorAll('#onlineCourseList .badge').forEach(badge=>{ const id = badge.getAttribute('data-course-id'); const course = onlineCourses.find(c=>c.id===id); if(course) badge.addEventListener('click',()=>{ openSafetyAgreement(()=>{ const orderId = createPaidOrder({type:'线上课程',coachName:course.teacher,courseName:course.name,time:new Date().toLocaleString(),price:course.price,detail:course.desc}); openPaymentSuccess(orderId); }); }); });
+  window.openVenueBookingModal = openVenueBookingModal;
+  window.openEquipmentRentalModal = openEquipmentRentalModal;
+  window.openSupplementCartModal = openSupplementCartModal;
+  window.suppAddToCart = suppAddToCart;
+  window.suppChangeQty = suppChangeQty;
+  window.goToSearchCoaches = function(){ switchPage('search'); setTimeout(()=>{ const input = document.getElementById('searchPageInput'); if(input){ input.value = '教练'; input.dispatchEvent(new Event('input')); } }, 50); };
+
+  // 绑定返回按钮事件
+  document.getElementById('coachBackToProfile')?.addEventListener('click', () => switchPage('profile'));
+  document.getElementById('adminBackToProfile')?.addEventListener('click', () => switchPage('profile'));
+  document.getElementById('coachIdentitySelect')?.addEventListener('change', function () { setCurrentCoachName(this.value); renderCoachAdminPanels(); });
+  document.getElementById('coachOrderDetailBtn')?.addEventListener('click', openCoachOrderDetailModal);
+  document.getElementById('coachWithdrawBtn')?.addEventListener('click', openCoachWithdrawModal);
+
+  // 初始化
+  initExtraStorage();
+  loadCreatedGroupsFromStorage();
+  loadProfileFromStorage();
+  loadOrdersFromStorage();
+  renderMyOnlineClasses();
+  initSearchPage();
+  renderDynamicGroups();
+  renderCoachAdminPanels();
+  bindAdminOperateMenu();
+  injectSettingsCard();
+</script>
+</body>
+</html>
